@@ -1,0 +1,16 @@
+auth_failed      65    
+conn_broken      66    
+inv_cmd          67        
+inv_par          68        
+Rerror           69         
+IOerror          70        
+not_open         71       
+access_denied    72  
+unsupported_cmd  73
+unknown_cmd      74    
+data_overflow    75  
+object_too_big   76 
+out_of_mem       77     
+ctrl_closed      78    
+session_busy     80   
+detach_failed    81 
