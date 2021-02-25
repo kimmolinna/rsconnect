@@ -1,99 +1,99 @@
-﻿:Namespace RServe
+﻿:Namespace RS
   :class robject
-    :field Public names←⍬
-    :field Public dim←⍬
-    :field public dimnames←⍬
-    :Field Public row_names←⍬
-    :Field Public class←⍬
-    :Field Public levels←⍬
-    :Field Public tsp←⍬
     :Field Public data←⍬
+    :field private _a←⊂''
+    :field private ga←⍬
+    :property keyed attributes
+    :access public
 
-    ∇ MakeAny arg
+    ∇ r←Get args
+      ⎕io←1 
+        :if args.IndexersSpecified
+          r←{0=≢⍵:⊂''⋄⍵[ga⍳⊃args.Indexers]}_a
+        :else
+          r←{0=≢⍵:,⊂''⋄ ga{b←⍸~_a∊⊂'' ⋄ ⍺[b]{⍺ ⍵}¨⍵[b]}⍵}_a
+        :endif
+      ∇
+    ∇ Set args
+    :if (⊂'')≡_a ⋄ _a←(⊂'')⍴⍨≢ga ⋄ :endif
+      _a[ga⍳⊃args.Indexers]←args.NewValue
+    ∇
+    :endproperty
+
+    :property default value
+    :Access Public
+    ∇ r←Get args
+      r←{⎕IO←1 ⋄ 1=≢data:,⍵ ⋄ ⍵}{attributes[⊂'class']≡⊂'factor':⍉attributes[⊂'levels'][⍵]
+        ∨/( {1=≢⍵:⍵⋄⊃⍵}attributes[⊂'class'])∊⊂'table':⍵{~⊃attributes[⊂'dim']≡⊂'':⍵⍪⍉(⌽⊃attributes[⊂'dim'])⍴⍺⋄ ⍵,[0.5]⍺}⊃attributes[⊂'names']{⍺≢⊂'':⍺⋄⍵}attributes[⊂'dimnames']
+        ~attributes[⊂'dim']≡⊂'':⍉(⌽⊃attributes[⊂'dim'])⍴⍵
+        ⍉↑{≡⍵:⍵ ⋄ (⊃⍵.attributes[⊂'levels'])[⍵.data]}¨{1=≡⍵:⊂⍵ ⋄ ⍵}⍵
+        }data
+    ∇
+    :endproperty
+
+    ∇ Make2 arg
       :Access Public
       :Implements Constructor
-      (names class levels row_names dim dimnames tsp data)←arg
-    ∇
+      ga←#.settings.r.attributes
+      attributes[⊃⊃arg]←2⊃⊃arg
+      data←{1=≢⍵:,↑⍵ ⋄ ⍵}2⊃arg
+      ∇
 
     ∇ Make0
       :Access Public
       :Implements Constructor
-    ∇
-
-    ∇ r←value
-      :Access Public
-      ⎕IO←1
-      r←{1=≢data:,⍵ ⋄ ⍵}{class≡'factor':⍉levels[⍵]
-        ∨/({1=≡⍵:,⊂⍵⋄⍵}class)∊⊂'table':⍵{~dim≡⍬:⍵⍪⍉(⌽dim)⍴⍺⋄{⍵⍴⍨2,(≢⍵)÷2}⍵,⍺}names{⍺≢⍬:⍺⋄⍵}dimnames
-        ~dim≡⍬:⍉(⌽dim)⍴⍵
-        ⍉↑{≡⍵:⍵ ⋄ ⍵.levels[⍵.data]}¨{1=≡⍵:⊂⍵ ⋄ ⍵}⍵
-        }data
-    ∇
-
-    ∇ r←attributes
-      :Access Public
-      ⎕IO←1
-      r←⍉2 5⍴('names' 'class' 'row.names' 'tsp' 'levels'),names class row_names tsp levels
-      r←r[⍸~r[;2]∊⊂⍬;]
-    ∇
+      ga←#.settings.r.attributes
+      ∇
+    
   :endclass
 
-  :Class client
-    ⍝ Interface from Dyalog APL to R
-    ⍝ Currently asssumes existence of #.DRC
+  :Class Rserve
+    ⍝ Interface from Dyalog APL to RServe
+    ⍝ Currently asssumes existence of #.Conga
     ⎕ML←1 ⋄ ⎕IO←0 ⋄ ⎕PP←34
     :Field Public CLT←''         ⍝ Public for debugging
     :Field Private LittleEndian
-    :field Private err←⍬
-    :field Private err_code←⍬  
-    :field Private sxt←⍬
-    :field Private sxt_code←⍬  
-    :field Private cmd←⍬
-    :field Private cmd_code←⍬  
-    :field Private dat←⍬
-    :field Private dat_code←⍬
+    :field private error←⍬
+    :field private command←⍬
+    :field private type←⍬
+    :field private sexp←⍬
+    :field private ga←⍬
+    :field private mac←0
+    :field private win←0
+    :field private bit64←0
+    :field private process←⍬
+
+    prop←{83=⎕dr ⍵:⊂(⍺.name,⊂⍬)[⍺.code⍳⍵] ⋄ (⍺.code,0)[⍺.name⍳⊃⍵]}
 
     :property keyed ERR
-    :access public
-      
-      ∇ r←get args
-        r←{83=⎕dr ⍵:⊂(err,⊂⍬)[err_code⍳⍵] ⋄ (err_code,0)[err⍳⊃⍵]}args.Indexers
-      ∇
+    :access public  
+    ∇ r←get args
+      r←error prop args.Indexers
+    ∇
     :endproperty
 
     :property keyed XT
-    :access public
-      
-      ∇ r←get args
-        r←{83=⎕dr ⍵:⊂(sxt,⊂⍬)[sxt_code⍳⍵] ⋄ (sxt_code,0)[sxt⍳⊃⍵]}args.Indexers
-      ∇
+    :access public  
+    ∇ r←get args
+      r←sexp prop args.Indexers
+    ∇
     :endproperty
 
     :property keyed CMD
     :access public
-      
-      ∇ r←get args
-        r←{83=⎕dr ⍵:⊂(cmd,⊂⍬)[cmd_code⍳⍵] ⋄ (cmd_code,0)[cmd⍳⊃⍵]}args.Indexers
-      ∇
+    ∇ r←get args
+      r←command prop args.Indexers
+    ∇
     :endproperty
     
     :property keyed DT
     :access public
-      
-      ∇ r←get args
-        r←{83=⎕dr ⍵:⊂(dat,⊂⍬)[dat_code⍳⍵] ⋄ (dat_code,0)[dat⍳⊃⍵]}args.Indexers
-      ∇
+    ∇ r←get args
+      r←type prop args.Indexers
+    ∇
     :endproperty
 
-    cols←{(((⍴⍵)÷⍺),⍺)⍴⍵} ⍝ 4 cols ⍵ reshapes to have 4 cols
-    fromsym←{z←¯1⌽⍵ ⋄ 1↓¨(z=⎕UCS 0)⊂z}
-    to64Int←{{⊃⍵:-2⊥~⍵⋄2⊥⍵},⌽[0]8 8⍴11 ⎕DR ⍵} ⍝ thanks VMJ for pimping my code
-    toReal←{(sign×exp×frac),⊖[0]4 8⍴11 ⎕DR ⍵} ⍝ thanks VMJ for pimping my code
-    frac←{⎕io←1⋄1++/2*-(9↓⍵)/⍳23}
-    exp←{2*127-⍨+/2*(⌽8↑1↓⍵)/⍳8}
-    sign←{¯1*1↑⍵}
     split←{a←⍺⋄''{0=⍴⍵:⍺ ⋄ ⍺,(⊂a↑⍵)∇(a↓⍵)}⍵}
-    rnd←{a←10*⍺ ⋄ a÷⍨⌊0.5+a×⍵}
     IntToBytes←{⎕FR←(⍺=8)⊃645 1287 ⋄ ⍺↑⎕UCS 80 ⎕DR(×⍵)×((2*(8×⍺))-1)⌊|⍵}
     b2i←{(⍺⍴256)⊥⌽⍵}
     ld←{⍵,⍨3 IntToBytes≢⍵}
@@ -101,6 +101,14 @@
     strOut←{DT[⊂'STRING'],ld{⍵↑⍨4×⌈(≢⍵)÷4}0,⍨⎕UCS ⍵}
     headData←{z←DRC.Send CLT(∊{4 IntToBytes ⍵}¨⍺(≢⍵)0 0) ⋄ SendWait ⍵}
     
+    ∇ r←kill
+      :access public
+      :if bit64
+        r←⎕sh 'kill -9 ',⍕⎕SH'pidof Rserve'
+      :elseif win
+
+      :endif
+    ∇
     ∇ o←eval s;b;d;dh;hdr;r;s;t;xt;z
       :Access Public
       s←{1=≡⍵:,⊂⍵ ⋄ ⍵}s
@@ -109,30 +117,19 @@
     ∇
 
 
-    ∇ o←object i;at;class;data;di;dim;dimnames;in;levels;names;out;row_names;tsp;xt
-      names←class←levels←row_names←dim←dimnames←tsp←data←⍬
-      xt←⊃i ⋄ i←1↓i
-      at←'names' 'class' 'levels' 'row.names' 'dim' 'dimnames' 'tsp'
+    ∇ o←object i;attr;b;data;in;xt
+      attr←(⊂'')⍴⍨≢ga ⋄ data←⍬ ⋄ xt←⊃i ⋄ i←1↓i
       :If xt∊128+XT['ARRAY_INT' 'ARRAY_DOUBLE' 'ARRAY_STR'] ⋄ i←⊃i ⋄ :EndIf
       :for in :in i
         :if (xt=128+XT[⊂'VECTOR'])
         :andIf 0>≡in
-        :andIf ∨/{⍵≡⊃⊃in}¨XT['ARRAY_INT' 'ARRAY_DOUBLE']
+        :andIf ∨/{⍵≡⊃⊃in}¨128+XT['ARRAY_INT' 'ARRAY_DOUBLE']
           data,←object in
           in←⍬
         :endIf
         :while 0≠⍴in
-          :if in[1]∊at
-            :select 1⊃in
-            :case 'row.names'
-              :if ¯2147483648≡⊃⊃in
-                row_names←1+⍳|1⊃⊃in
-              :else
-                row_names←⊃in
-              :endIf
-            :else 
-              ⍎(1⊃in),'←⊃in'
-            :EndSelect
+          :if ∨/b←ga∊in[1]
+            attr[⍸b]←⊂(⊃in){'row.names'≡⍵:{¯2147483648≡⊃⍵:1+⍳|1⊃⍵⋄⍵}⍺⋄⍺}1⊃in
             in←2↓in
           :else
             data,←{xt∊128+XT[⊂'ARRAY_STR']:⍵⋄⊂⍵}in⋄in←⍬
@@ -140,8 +137,7 @@
         :EndWhile
       :EndFor
 
-      out←(names class levels row_names dim dimnames tsp ({1=≢⍵:⊃⍵ ⋄⍵ }data))  
-      o←⎕NEW robject out
+      o←⎕NEW robject ((ga attr) data)
     ∇
 
     ∇ o←decode i;h;s;xt
@@ -165,11 +161,11 @@
         SendWait ⍵}¨d
     ∇
 
-    ∇ o←{type}SEXPout i;a;at;b;d;dim;dt;in;ts;type
-      :If 0=⎕NC'type' ⋄ type←⎕DR i ⋄ :EndIf
-      :Select type
+    ∇ o←{ty}SEXPout i;a;at;b;d;dim;dt;in;ts;ty
+      :If 0=⎕NC'ty' ⋄ ty←⎕DR i ⋄ :EndIf
+      :Select ty
       :Caselist XT['SYMNAME' 'ARRAY_STR']
-        o←type,ld{⍵,1⍴⍨4-4|≢⍵}∊{0,⍨⎕UCS ⍵}¨i
+        o←ty,ld{⍵,1⍴⍨4-4|≢⍵}∊{0,⍨⎕UCS ⍵}¨i
       :Caselist XT[⊂'ARRAY_INT'],83
         :If 1=≢⍴i ⍝ vector
           o←XT[⊂'ARRAY_INT'],ld∊4 IntToBytes¨{1=≢⍵:⊃⍵ ⋄ ⍵}i
@@ -181,7 +177,7 @@
           o←(128+XT[⊂'ARRAY_INT']),ld li,d
         :EndIf
       :Case 326     ⍝ robjects
-        ts←{∨/⍵[⍵[;0]⍳⊂'class';1]∊⊂'ts'}i.attributes
+        ts←∨/i.attributes[⊂'class']∊⊂'ts'
 
         :If ts
           d←XT[⊂'ARRAY_DOUBLE'] SEXPout¨{1=≡⍵:,⊂⍵ ⋄ ⍵}i.data
@@ -189,24 +185,24 @@
           d←SEXPout¨{1=≡⍵:,⊂⍵ ⋄ ⍵}i.data
         :EndIf
 
-        at←i.attributes
+        at←i.attributes[]
 
-        :If ∨/b←at[;0]∊⊂'row.names'
-        :AndIf {⎕IO←1 ⋄ ⍵≡⍳¯1↑⍵}⊃at[in←⍸b;1]
-          b←¯1↑⊃at[in;1]
-          at[in;1]←⊂¯2147483648,b
+        :If (⊂'')≢i.attributes[⊂'row.names']
+        :AndIf {⎕IO←1 ⋄ ⍵≡⍳¯1↑⍵}⊃i.attributes[⊂'row.names']
+          b←¯1↑⊃i.attributes[⊂'row.names']
+          at[{⍵⍳⊂'row.names'}0⊃¨at]←⊂(⊂'row.names'),⊂¯2147483648 b
         :EndIf
 
         a←∊{{(⊃⍵)SEXPout(1↓⍵)}¨({
             (XT['ARRAY_INT' 'ARRAY_DOUBLE' 'ARRAY_STR']⊃⍨323 645 80⍳⎕DR∊⍵),{
-                1=≡⍵:⊂⍵ ⋄ ⍵}⍵}1⊃⍵)(XT[⊂'SYMNAME'],⍵[0])}¨↓at
+                1=≡⍵:⊂⍵ ⋄ ⍵}⍵}1⊃⍵)(XT[⊂'SYMNAME'],⍵[0])}¨at
         :If (⍴d)<total
           d←∊d ⋄ dt←⊃d
           o←(128+dt),ld(4↓d),⍨XT[⊂'LIST_TAG'],ld a
         :Else
           o←(128+XT[⊂'VECTOR']),ld(∊d),⍨XT[⊂'LIST_TAG'],ld a
         :EndIf
-      :Caselist XT[⊂'ARRAY_DOUBLE'],163 323 645     ⍝ doubles
+      :Caselist XT[⊂'ARRAY_DOUBLE'],163 323 645 
         :If 1=≢⍴i
           o←XT[⊂'ARRAY_DOUBLE'],ld ⎕UCS 80 ⎕DR{645≠⎕DR ⍵:⊃0 645 ⎕DR ⍵ ⋄ ⍵}∊i
         :Else
@@ -221,7 +217,7 @@
       :EndSelect
     ∇
 
-    ∇ o←t SEXPin i;a;b;class;d;dh;dim;dt;hdr;ii;in;levels;names;out;row;s;save;st;type;xt
+    ∇ o←t SEXPin i;a;b;class;d;dh;dim;dt;hdr;ii;in;levels;names;out;row;s;save;st;ty;xt
       o←⍬ ⋄ d←⍬
       :While (0≠≢i)∧(0≠+/i)
         xt←⊃i ⋄ s←(3 b2i i[1 2 3]) ⋄ i←4↓i ⋄ ii←s↑i
@@ -283,39 +279,35 @@
       :Until done
     ∇
     
-    ∇ Make;a;address;b;h;out;port;r;rc;step;z
+    ∇ Make;a;b;f;h;out;p;r;rc;step;z
       :Access public
       :Implements constructor
-      a←'auth_failed' 'conn_broken' 'inv_cmd' 'inv_par'
-      a,←'Rerror' 'IOerror' 'not_open' 'access_denied' 
-      a,←'unsupported_cmd' 'unknown_cmd' 'data_overflow'
-      a,←'object_too_big' 'out_of_mem' 'ctrl_closed'
-      a,←'session_busy' 'detach_failed'
-      b←65 66 67 68 69 70 71 72 73 74 75 76 77 78 80 81
-      err err_code←a b   
-      a←'NULL' 'INT' 'DOUBLE' 'STR' 'LANG' 'SYM' 'BOOL'
-      a,←'S4' 'VECTOR' 'LIST' 'CLOS' 'SYMNAME' 'LIST_NOTAG'
-      a,←'LIST_TAG' 'LANG_NOTAG' 'LANG_TAG' 'VECTOR_EXP'
-      a,←'VECTOR_STR' 'ARRAY_INT' 'ARRAY_DOUBLE' 'ARRAY_STR'
-      a,←'ARRAY_BOOL_UA' 'ARRAY_BOOL' 'RAW' 'ARRAY_CPLX' 'UNKNOWN'
-      b←0 1 2 3 4 5 6 7 16 17 18 19 20 21 22 23 26 27
-      b,← 32 33 34 35 36 37 38 48 
-      (sxt sxt_code)←a b
-      a←'login' 'voidEval' 'eval' 'shutdown' 'openFile'
-      a,←'createFile' 'closeFile' 'readFile' 'writeFile'
-      a,←'removeFile' 'setSEXP' 'assignSEXP' 'setBufferSize'
-      a,←'setEncoding' 'detachSession' 'detachedVoidEval'
-      a,←'attachSession' 'ctrlEval' 'ctrlSource' 'ctrlShutdown' 
-      b←1 2 3 4 16 17 18 19 20 21 32 33 129 130 48 49 50 66 69 68
-      (cmd cmd_code)←a b 
-      a←'INT' 'CHAR' 'DOUBLE' 'STRING' 'BYTESTREAM' 'SEXP'
-      a,←'ARRAY' 'LARGE' 
-      b←1 2 3 4 5 10 11 64
-      (dat dat_code)←a b
-      (address port)←'localhost' 6311
-      ⍝'Credentials must be single-byte char'⎕SIGNAL(80≠⎕DR credentials)/11
-      DRC←#.Conga.Init''
-      :If 0=0⊃z←DRC.Clt''address port'Raw'⊣step←'Connection'
+      #.settings←⎕json⊃⎕nget'settings.json',⍨⊃⎕nparts #.RS{⍺{0=≢⍵:⍺.SALT_Data.SourceFile ⋄ ⍵}⊃⍵{⍵[⍸(⊂⍺){∨/⍺⍷⍵}¨⍵]}⊃¨5176⌶⍬}'rserve.dyalog'
+      mac win bit64←∨/¨'Mac' 'Windows' '64'⍷¨⊂⊃'.'⎕WG'APLVersion'
+      error←#.settings.r.error ⋄ command←#.settings.r.command
+      sexp←#.settings.r.sexp ⋄ type←#.settings.r.type
+      ga←#.settings.r.attributes
+      
+      :if bit64
+        :if 0=≢⎕SH'pidof Rserve;exit 0'
+          ⎕SH'R CMD Rserve --no-save --RS-port ',(⍕#.settings.rserve.port),' >~/Rserve.log 2>&1'
+        :endif
+      :elseif win 
+        ⎕USING←,⊂'System.Diagnostics',',',#.settings.dotnet.framework,#.settings.dotnet.lib 
+        si←⎕NEW ProcessStartInfo(⊂#.settings.r.home,'bin\x64\Rserve.exe') 
+        si.Arguments←'--slave --RS-port ',⍕#.settings.rserve.port 
+        si.WindowStyle←ProcessWindowStyle.Hidden 
+        si.CreateNoWindow←1 
+        process←Process.Start startInfo    
+      :else mac
+      :endif
+
+      :if 0=⎕nc 'RS.DRC' 
+        :if 0=⎕nc '#.Conga'⋄'Conga' #.⎕CY 'conga' ⋄ :endif
+        DRC←#.Conga.Init'' 
+      :endif
+
+      :If 0=0⊃z←DRC.Clt'' #.settings.rserve.address #.settings.rserve.port'Raw'⊣step←'Connection'
         CLT←1⊃z
       :AndIf 0=0⊃z←DRC.Wait CLT 32⊣step←'Wait for confirmation'
       :AndIf 32=≢h←⎕UCS 3⊃z⊣step←'Check R header'
@@ -330,9 +322,10 @@
     ∇ UnMake
       :Implements destructor
       :Trap 0 ⍝ Ignore errors in teardown
-     ∘
+        :if win ⋄ process.Kill '' ⋄ :endif
         :If 0≠≢DRC.Names'' ⋄ {}DRC.Close¨DRC.Names'' ⋄ :EndIf
       :EndTrap
     ∇
   :endclass
 :EndNamespace
+

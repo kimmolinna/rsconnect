@@ -1,15 +1,6 @@
-]load /home/kimmo/dyalog/rserve/rserve
-)copy conga Conga
+2 ⎕FIX 'file:///home/kimmo/dyalog/rserve/rserve.dyalog'
 ⎕path←'↑ ⎕se.Dyalog.Utils'
-r←⎕new RServe.client
-
-⎕SH'R CMD Rserve --no-save >~/Rserve.log 2>&1'
-⎕sh 'kill -9 ',⍕⎕SH'pidof Rserve'
-
-
-library(remotes)
-install_local("/home/kimmo/Downloads/rscproxy_2.0-6.tar.gz")
-
+r←⎕new RS.Rserve
 
 r.eval '1+2'
 r.eval 'c(1,2,3)*c(10,20,30)'
@@ -27,39 +18,34 @@ expr,←'xlab="X",ylab="Y",zlab="Z")'
 r.eval expr
 r.eval 'graphics.off()'
 co2←r.eval 'co2'
-co2.attributes
-co2.class
-co2.tsp  
+co2.attributes[]
+↑co2.attributes[]
+co2.attributes[⊂'class']
+co2.attributes[⊂'tsp']  
 8↑co2.value
-co2.value[2 4 6]
+co2[2 4 6]
 r.eval 'age <-18:20'
 'height' r.set (76.1 77 78.1)
 v←r.eval 'village <-data.frame(age=age,height=height)'
 ]boxing on
-v.attributes
+v.attributes[]
+↑v.attributes[]
 v.value
-obj←⎕new #.RServe.robject
-obj.tsp←2014(2014+11÷12)12
-obj.class←'ts'
+obj←⎕new #.RS.robject
+obj.attributes['tsp' 'class']←(2014(2014+11÷12)12) 'ts'
 obj.data←?12⍴100
 'myts' r.set obj
 (r.eval 'summary(myts)').value
-mydf←⎕new #.RServe.robject
-mydf.class←'data.frame'
-mydf.names←'xx' 'square'
+mydf←⎕new #.RS.robject
+mydf.attributes['class' 'names']←'data.frame' ('xx' 'square')
 mydf.data←↓[1]((⍳12)∘.*1 2)
 'mydf' r.set mydf
 (r.eval'summary(mydf)').value
+a←r.eval'iris'
+'out' r.set a
+a.value≡(r.eval 'out').value
 
-Response
-   ]load /home/kimmo/dyalog/R/R
-#.R
-]LINK.create rserve /home/kimmo/dyalog/rserve
-Linked: #.rserve ←→ /home/kimmo/dyalog/rserve
-)copy conga Conga
-/opt/mdyalog/18.0/64/unicode/ws/conga.dws saved Fri Dec 11 03:11:01 2020
-⎕path←'↑ ⎕se.Dyalog.Utils'
-      r←⎕new R
+
 
       r.eval '1+2'
 3
@@ -80,35 +66,41 @@ r.eval 'c(1,2,3)*c(10,20,30)'
 1⍕10↑r.eval 'normR'
  98.5 100.3 99.1 100.0 98.5 100.6 99.5 100.4 99.6 100.7
 (r.eval 'summary(normR)').value
-┌───────────┬───────────┬───────────┬──────────┬───────────┬───────────┐
-│Min.       │1st Qu.    │Median     │Mean      │3rd Qu.    │Max.       │
-├───────────┼───────────┼───────────┼──────────┼───────────┼───────────┤
-│96.96542886│99.30733807│99.96416949│100.001958│100.6613411│103.4399716│
-└───────────┴───────────┴───────────┴──────────┴───────────┴───────────┘
-x← ¯10 10 {⍺[1]++\0,⍵⍴(|-/⍺)÷⍵} 50
+96.96542886 99.30733807 99.96416949 100.001958 100.6613411 103.4399716
+x←¯10 10 {⍺[1]++\0,⍵⍴(|-/⍺)÷⍵} 50
 z←x∘.{{10×(1○⍵)÷⍵}((⍺*2)+⍵*2)*.5}x
 ('x' 'z') r.set (x z)
 1 1
 expr←'persp(x,x,z,theta=30,phi=30,expand=0.5,'
 expr,←'xlab="X",ylab="Y",zlab="Z")'
 r.eval expr
-#.[R].[robject]
+#.[Rserve].[robject]
 r.eval 'graphics.off()'
-#.[R].[robject]
+
 co2←r.eval 'co2'
-co2.attributes
+co2.attributes[]
+┌──────────┬─────────────────────────┐
+│┌─────┬──┐│┌───┬───────────────────┐│
+││class│ts│││tsp│1959 1997.916667 12││
+│└─────┴──┘│└───┴───────────────────┘│
+└──────────┴─────────────────────────┘
+↑co2.attributes[]
 ┌─────┬───────────────────┐
 │class│ts                 │
 ├─────┼───────────────────┤
 │tsp  │1959 1997.916667 12│
 └─────┴───────────────────┘
-co2.class
-ts
-co2.tsp  
-1959 1997.916667 12
+co2.attributes[⊂'class']
+┌──┐
+│ts│
+└──┘
+co2.attributes[⊂'tsp']  
+┌───────────────────┐
+│1959 1997.916667 12│
+└───────────────────┘
 8↑co2.value
 315.42 316.31 316.5 317.56 318.13 318 316.39 314.65
-co2.value[2 4 6]
+co2[2 4 6]
 316.31 317.56 318
 r.eval 'age <-18:20'
 18 19 20
@@ -117,7 +109,15 @@ r.eval 'age <-18:20'
 v←r.eval 'village <-data.frame(age=age,height=height)'
 ]boxing on
 Was ON
-v.attributes
+v.attributes[]
+┌────────────────────┬──────────────────┬─────────────────┐
+│┌─────┬────────────┐│┌─────┬──────────┐│┌─────────┬─────┐│
+││names│┌───┬──────┐│││class│data.frame│││row.names│1 2 3││
+││     ││age│height│││└─────┴──────────┘│└─────────┴─────┘│
+││     │└───┴──────┘││                  │                 │
+│└─────┴────────────┘│                  │                 │
+└────────────────────┴──────────────────┴─────────────────┘
+↑v.attributes[]
 ┌─────────┬────────────┐
 │names    │┌───┬──────┐│
 │         ││age│height││
@@ -131,21 +131,15 @@ v.value
 18 76.1
 19 77  
 20 78.1
-obj←⎕new #.rserve.robject
-obj.tsp←2014(2014+11÷12)12
-obj.class←'ts'
+obj←⎕new #.RS.robject
+obj.attributes['tsp' 'class']←(2014(2014+11÷12)12) 'ts'
 obj.data←?12⍴100
 'myts' r.set obj
 1
 (r.eval 'summary(myts)').value
-┌────┬───────┬──────┬─────┬───────┬────┐
-│Min.│1st Qu.│Median│Mean │3rd Qu.│Max.│
-├────┼───────┼──────┼─────┼───────┼────┤
-│1   │18     │48.5  │42.75│62.75  │83  │
-└────┴───────┴──────┴─────┴───────┴────┘
-mydf←⎕new #.rserve.robject
-mydf.class←'data.frame'
-mydf.names←'xx' 'square'
+2 31.75 57 51 64.25 95
+mydf←⎕new #.RS.robject
+mydf.attributes['class' 'names']←'data.frame' ('xx' 'square')
 mydf.data←↓[1]((⍳12)∘.*1 2)
 'mydf' r.set mydf
 1
@@ -165,3 +159,8 @@ mydf.data←↓[1]((⍳12)∘.*1 2)
 ├───────────────┼────────────────┤
 │Max.   :12.00  │Max.   :144.00  │
 └───────────────┴────────────────┘
+a←r.eval'iris'
+'out' r.set a
+1
+a.value≡(r.eval 'out').value
+1

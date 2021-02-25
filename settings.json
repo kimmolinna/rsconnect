@@ -1,0 +1,310 @@
+{
+  "rserve":{
+    "address": "localhost",
+    "port": 6311
+  },
+  "dotnet": {
+    "framework": "C:/Program Files/dotnet/packs/NETStandard.Library.Ref/2.1.0/ref/netstandard2.1/",
+    "lib": "System.Diagnostics.Process.dll"
+  },
+  "r": {
+    "home": "C:/Program Files/R/R-4.0.4/",
+    "attributes": [
+      "names",
+      "class",
+      "levels",
+      "row.names",
+      "dim",
+      "dimnames",
+      "tsp"
+    ],
+    "error": [
+      {
+        "name": "auth_failed",
+        "code": 65
+      },
+      {
+        "name": "conn_broken",
+        "code": 66
+      },
+      {
+        "name": "inv_cmd",
+        "code": 67
+      },
+      {
+        "name": "inv_par",
+        "code": 68
+      },
+      {
+        "name": "Rerror",
+        "code": 69
+      },
+      {
+        "name": "IOerror",
+        "code": 70
+      },
+      {
+        "name": "not_open",
+        "code": 71
+      },
+      {
+        "name": "access_denied",
+        "code": 72
+      },
+      {
+        "name": "unsupported_cmd",
+        "code": 73
+      },
+      {
+        "name": "unknown_cmd",
+        "code": 74
+      },
+      {
+        "name": "data_overflow",
+        "code": 75
+      },
+      {
+        "name": "object_too_big",
+        "code": 76
+      },
+      {
+        "name": "out_of_mem",
+        "code": 77
+      },
+      {
+        "name": "ctrl_closed",
+        "code": 78
+      },
+      {
+        "name": "session_busy",
+        "code": 80
+      },
+      {
+        "name": "detach_failed",
+        "code": 81
+      }
+    ],
+    "sexp": [
+      {
+        "name": "NULL",
+        "code": 0
+      },
+      {
+        "name": "INT",
+        "code": 1
+      },
+      {
+        "name": "DOUBLE",
+        "code": 2
+      },
+      {
+        "name": "STR",
+        "code": 3
+      },
+      {
+        "name": "LANG",
+        "code": 4
+      },
+      {
+        "name": "SYM",
+        "code": 5
+      },
+      {
+        "name": "BOOL",
+        "code": 6
+      },
+      {
+        "name": "S4",
+        "code": 7
+      },
+      {
+        "name": "VECTOR",
+        "code": 16
+      },
+      {
+        "name": "LIST",
+        "code": 17
+      },
+      {
+        "name": "CLOS",
+        "code": 18
+      },
+      {
+        "name": "SYMNAME",
+        "code": 19
+      },
+      {
+        "name": "LIST_NOTAG",
+        "code": 20
+      },
+      {
+        "name": "LIST_TAG",
+        "code": 21
+      },
+      {
+        "name": "LANG_NOTAG",
+        "code": 22
+      },
+      {
+        "name": "LANG_TAG",
+        "code": 23
+      },
+      {
+        "name": "VECTOR_EXP",
+        "code": 26
+      },
+      {
+        "name": "VECTOR_STR",
+        "code": 27
+      },
+      {
+        "name": "ARRAY_INT",
+        "code": 32
+      },
+      {
+        "name": "ARRAY_DOUBLE",
+        "code": 33
+      },
+      {
+        "name": "ARRAY_STR",
+        "code": 34
+      },
+      {
+        "name": "ARRAY_BOOL_UA",
+        "code": 35
+      },
+      {
+        "name": "ARRAY_BOOL",
+        "code": 36
+      },
+      {
+        "name": "RAW",
+        "code": 37
+      },
+      {
+        "name": "ARRAY_CPLX",
+        "code": 38
+      },
+      {
+        "name": "UNKNOWN",
+        "code": 48
+      }
+    ],
+    "command": [
+      {
+        "name": "login",
+        "code": 1
+      },
+      {
+        "name": "voidEval",
+        "code": 2
+      },
+      {
+        "name": "eval",
+        "code": 3
+      },
+      {
+        "name": "shutdown",
+        "code": 4
+      },
+      {
+        "name": "openFile",
+        "code": 16
+      },
+      {
+        "name": "createFile",
+        "code": 17
+      },
+      {
+        "name": "closeFile",
+        "code": 18
+      },
+      {
+        "name": "readFile",
+        "code": 19
+      },
+      {
+        "name": "writeFile",
+        "code": 20
+      },
+      {
+        "name": "removeFile",
+        "code": 21
+      },
+      {
+        "name": "setSEXP",
+        "code": 32
+      },
+      {
+        "name": "assignSEXP",
+        "code": 33
+      },
+      {
+        "name": "setBufferSize",
+        "code": 129
+      },
+      {
+        "name": "setEncoding",
+        "code": 130
+      },
+      {
+        "name": "detachSession",
+        "code": 48
+      },
+      {
+        "name": "detachedVoidEval",
+        "code": 49
+      },
+      {
+        "name": "attachSession",
+        "code": 50
+      },
+      {
+        "name": "ctrlEval",
+        "code": 66
+      },
+      {
+        "name": "ctrlSource",
+        "code": 69
+      },
+      {
+        "name": "ctrlShutdown",
+        "code": 68
+      }
+    ],
+    "type": [
+      {
+        "name": "INT",
+        "code": 1
+      },
+      {
+        "name": "CHAR",
+        "code": 2
+      },
+      {
+        "name": "DOUBLE",
+        "code": 3
+      },
+      {
+        "name": "STRING",
+        "code": 4
+      },
+      {
+        "name": "BYTESTREAM",
+        "code": 5
+      },
+      {
+        "name": "SEXP",
+        "code": 10
+      },
+      {
+        "name": "ARRAY",
+        "code": 11
+      },
+      {
+        "name": "LARGE",
+        "code": 64
+      }
+    ]
+  }
+}
