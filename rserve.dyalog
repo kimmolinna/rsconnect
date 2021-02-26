@@ -143,7 +143,7 @@
     ∇ o←decode i;h;s;xt
       o←⍬ ⋄ h←16↑i ⋄ i←16↓i
       :If 1≠⊃h
-        o←'Error',⊃ERR[3⊃h] ⋄ →0
+        o←('Error'),⍕⊃ERR[3⊃h] ⋄ →0
       :endif
 
       :While 0≠≢i

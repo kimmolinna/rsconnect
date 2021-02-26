@@ -1,15 +1,18 @@
 Linux:
+```apl
 ]load /home/kimmo/dyalog/rserve/rserve.dyalog
 or
 2 ⎕FIX 'file:///home/kimmo/dyalog/rserve/rserve.dyalog'
-
+```
 Windows:
+```apl
 ]load '/users/kimmo/onedrive/asiakirjat/github/rserve/rserve.dyalog'
+or
 2 ⎕FIX 'file:///users/kimmo/onedrive/asiakirjat/github/rserve/rserve.dyalog'
-
-
+```
+A test set:
+```apl
 r←⎕new RS.Rserve
-
 ]boxing on
 ⎕ml←1
 r.eval '1+2'
@@ -53,8 +56,10 @@ mydf.data←↓[1]((⍳12)∘.*1 2)
 a←r.eval'iris'
 'out' r.set a
 a.value≡(r.eval 'out').value
-
-    ]boxing on
+```
+Responses:
+```apl
+]boxing on
 Was ON
         ⎕ml←1
 r.eval '1+2'
@@ -180,3 +185,4 @@ a←r.eval'iris'
 1
 a.value≡(r.eval 'out').value
 1
+```
