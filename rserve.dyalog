@@ -1,13 +1,13 @@
 ﻿:Namespace RS
   :class robject
+    ⎕ML←1 ⋄ ⎕IO←1 ⋄ ⎕PP←34
     :Field Public data←⍬
     :field private _a←⊂''
     :field private ga←⍬
     :property keyed attributes
     :access public
 
-    ∇ r←Get args
-      ⎕io←1 
+    ∇ r←Get args 
         :if args.IndexersSpecified
           r←{0=≢⍵:⊂''⋄⍵[ga⍳⊃args.Indexers]}_a
         :else
@@ -23,8 +23,8 @@
     :property default value
     :Access Public
     ∇ r←Get args
-      r←{⎕IO←1 ⋄ 1=≢data:,⍵ ⋄ ⍵}{attributes[⊂'class']≡⊂'factor':⍉attributes[⊂'levels'][⍵]
-        ∨/( {1=≢⍵:⍵⋄⊃⍵}attributes[⊂'class'])∊⊂'table':⍵{~⊃attributes[⊂'dim']≡⊂'':⍵⍪⍉(⌽⊃attributes[⊂'dim'])⍴⍺⋄ ⍵,[0.5]⍺}⊃attributes[⊂'names']{⍺≢⊂'':⍺⋄⍵}attributes[⊂'dimnames']
+      r←{1=≢data:,⍵ ⋄ ⍵}{attributes[⊂'class']≡⊂'factor':⍉attributes[⊂'levels'][⍵]
+        ∨/( {1=≡⊃⍵:⍵⋄⊃⍵}attributes[⊂'class'])∊⊂'table':⍵{~⊃attributes[⊂'dim']≡⊂'':⍵⍪⍉(⌽⊃attributes[⊂'dim'])⍴⍺⋄ ⍵,[0.5]⍺}⊃attributes[⊂'names']{⍺≢⊂'':⍺⋄⍵}attributes[⊂'dimnames']
         ~attributes[⊂'dim']≡⊂'':⍉(⌽⊃attributes[⊂'dim'])⍴⍵
         ⍉↑{≡⍵:⍵ ⋄ (⊃⍵.attributes[⊂'levels'])[⍵.data]}¨{1=≡⍵:⊂⍵ ⋄ ⍵}⍵
         }data
@@ -100,7 +100,7 @@
     evalOut←{0,⍨DT[⊂'STRING'],ld{⍵↑⍨4×⌈(≢⍵)÷4}10,⍨⎕UCS ⍵}
     strOut←{DT[⊂'STRING'],ld{⍵↑⍨4×⌈(≢⍵)÷4}0,⍨⎕UCS ⍵}
     headData←{z←DRC.Send CLT(∊{4 IntToBytes ⍵}¨⍺(≢⍵)0 0) ⋄ SendWait ⍵}
-    
+
     ∇ r←kill
       :access public
       :if bit64
@@ -279,27 +279,38 @@
       :Until done
     ∇
     
-    ∇ Make;a;b;f;h;out;p;r;rc;step;z
+    ∇ Make;a;b;f;h;out;p;r;rc;step;z;si;c;wf
       :Access public
       :Implements constructor
-      #.settings←⎕json⊃⎕nget'settings.json',⍨⊃⎕nparts #.RS{⍺{0=≢⍵:⍺.SALT_Data.SourceFile ⋄ ⍵}⊃⍵{⍵[⍸(⊂⍺){∨/⍺⍷⍵}¨⍵]}⊃¨5176⌶⍬}'rserve.dyalog'
+      wf←⊃⎕nparts #.RS{⍺{0=≢⍵:⍺.SALT_Data.SourceFile ⋄ ⍵}' '~⍨⊃⍵{⍵[⍸(⊂⍺){∨/⍺⍷⍵}¨⍵]}⊃¨5176⌶⍬}'rserve.dyalog'
+      #.settings←⎕json⊃⎕nget wf,'settings.json'
       mac win bit64←∨/¨'Mac' 'Windows' '64'⍷¨⊂⊃'.'⎕WG'APLVersion'
       error←#.settings.r.error ⋄ command←#.settings.r.command
       sexp←#.settings.r.sexp ⋄ type←#.settings.r.type
       ga←#.settings.r.attributes
       
-      :if bit64
+      :if (mac⍱win)   ⍝ linux
         :if 0=≢⎕SH'pidof Rserve;exit 0'
           ⎕SH'R CMD Rserve --no-save --RS-port ',(⍕#.settings.rserve.port),' >~/Rserve.log 2>&1'
         :endif
       :elseif win 
-        ⎕USING←,⊂'System.Diagnostics',',',#.settings.dotnet.framework,#.settings.dotnet.lib 
-        si←⎕NEW ProcessStartInfo(⊂#.settings.r.home,'bin\x64\Rserve.exe') 
-        si.Arguments←'--slave --RS-port ',⍕#.settings.rserve.port 
-        si.WindowStyle←ProcessWindowStyle.Hidden 
-        si.CreateNoWindow←1 
-        process←Process.Start startInfo    
-      :else mac
+        :trap 0
+          ⎕USING←,⊂'System.Diagnostics',',',#.settings.dotnet.framework,#.settings.dotnet.lib 
+          si←⎕NEW ProcessStartInfo(⊂#.settings.r.home,'bin\x64\Rserve.exe') 
+          si.Arguments←'--slave --RS-port ',⍕#.settings.rserve.port 
+          si.WindowStyle←ProcessWindowStyle.Hidden 
+          si.CreateNoWindow←1 
+          process←Process.Start si 
+        :else
+          a←⎕CMD 'taskkill /IM Rserve.exe /F'
+          c←'start /b "rserve" ',('/'⎕R'\\') '"',#.settings.r.home
+          c,←'bin\x64\Rserve.exe" --no-save --slave --RS-port '
+          c,←(⍕#.settings.rserve.port),' >Rserve.log'
+          (⊂'@ECHO OFF' c) ⎕NPUT (wf,'Windows\start.bat') 1
+          a←⎕cmd (wf,'Windows\start.bat') 'hidden'         
+        :endtrap
+      :elseif mac
+        ∘ ⍝ my macbook is broken
       :endif
 
       :if 0=⎕nc 'RS.DRC' 
@@ -319,13 +330,18 @@
       :EndIf
     ∇
 
-    ∇ UnMake
+    ∇ UnMake;a
       :Implements destructor
       :Trap 0 ⍝ Ignore errors in teardown
-        :if win ⋄ process.Kill '' ⋄ :endif
+        :if win 
+          :if ⍬≢process
+            process.Kill '' 
+          :else
+             a←⎕CMD 'taskkill /IM Rserve.exe /F'
+          :endif
+        :endif
         :If 0≠≢DRC.Names'' ⋄ {}DRC.Close¨DRC.Names'' ⋄ :EndIf
       :EndTrap
     ∇
   :endclass
 :EndNamespace
-

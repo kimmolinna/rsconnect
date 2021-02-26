@@ -1,7 +1,17 @@
+Linux:
+]load /home/kimmo/dyalog/rserve/rserve.dyalog
+or
 2 ⎕FIX 'file:///home/kimmo/dyalog/rserve/rserve.dyalog'
-⎕path←'↑ ⎕se.Dyalog.Utils'
+
+Windows:
+]load '/users/kimmo/onedrive/asiakirjat/github/rserve/rserve.dyalog'
+2 ⎕FIX 'file:///users/kimmo/onedrive/asiakirjat/github/rserve/rserve.dyalog'
+
+
 r←⎕new RS.Rserve
 
+]boxing on
+⎕ml←1
 r.eval '1+2'
 r.eval 'c(1,2,3)*c(10,20,30)'
 (r.eval 'matrix(1:12,3)').value
@@ -27,7 +37,6 @@ co2[2 4 6]
 r.eval 'age <-18:20'
 'height' r.set (76.1 77 78.1)
 v←r.eval 'village <-data.frame(age=age,height=height)'
-]boxing on
 v.attributes[]
 ↑v.attributes[]
 v.value
@@ -45,9 +54,10 @@ a←r.eval'iris'
 'out' r.set a
 a.value≡(r.eval 'out').value
 
-
-
-      r.eval '1+2'
+    ]boxing on
+Was ON
+        ⎕ml←1
+r.eval '1+2'
 3
 r.eval 'c(1,2,3)*c(10,20,30)'
 10 40 90
@@ -60,13 +70,17 @@ r.eval 'c(1,2,3)*c(10,20,30)'
 5  6  7  8
 9 10 11 12
 1⍕10↑normAPL←r.eval 'rnorm(1000,100,1)'
- 98.5 100.3 99.1 100.0 98.5 100.6 99.5 100.4 99.6 100.7
+ 99.9 99.5 98.6 100.8 100.4 100.5 98.9 99.8 99.1 99.9
 'normR' r.set normAPL
 1
 1⍕10↑r.eval 'normR'
- 98.5 100.3 99.1 100.0 98.5 100.6 99.5 100.4 99.6 100.7
+ 99.9 99.5 98.6 100.8 100.4 100.5 98.9 99.8 99.1 99.9
 (r.eval 'summary(normR)').value
-96.96542886 99.30733807 99.96416949 100.001958 100.6613411 103.4399716
+┌───────────┬───────────┬───────────┬───────────┬───────────┬───────────┐
+│Min.       │1st Qu.    │Median     │Mean       │3rd Qu.    │Max.       │
+├───────────┼───────────┼───────────┼───────────┼───────────┼───────────┤
+│96.33068387│99.26926846│99.97939797│99.95441358│100.6525874│103.4745601│
+└───────────┴───────────┴───────────┴───────────┴───────────┴───────────┘
 x←¯10 10 {⍺[1]++\0,⍵⍴(|-/⍺)÷⍵} 50
 z←x∘.{{10×(1○⍵)÷⍵}((⍺*2)+⍵*2)*.5}x
 ('x' 'z') r.set (x z)
@@ -107,8 +121,6 @@ r.eval 'age <-18:20'
 'height' r.set (76.1 77 78.1)
 1
 v←r.eval 'village <-data.frame(age=age,height=height)'
-]boxing on
-Was ON
 v.attributes[]
 ┌────────────────────┬──────────────────┬─────────────────┐
 │┌─────┬────────────┐│┌─────┬──────────┐│┌─────────┬─────┐│
@@ -137,7 +149,11 @@ obj.data←?12⍴100
 'myts' r.set obj
 1
 (r.eval 'summary(myts)').value
-2 31.75 57 51 64.25 95
+┌────┬───────┬──────┬───────────┬───────┬────┐
+│Min.│1st Qu.│Median│Mean       │3rd Qu.│Max.│
+├────┼───────┼──────┼───────────┼───────┼────┤
+│2   │13     │41.5  │41.08333333│61.5   │92  │
+└────┴───────┴──────┴───────────┴───────┴────┘
 mydf←⎕new #.RS.robject
 mydf.attributes['class' 'names']←'data.frame' ('xx' 'square')
 mydf.data←↓[1]((⍳12)∘.*1 2)
