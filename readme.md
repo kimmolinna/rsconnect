@@ -1,5 +1,5 @@
 # RSconnect - R connection for DyalogAPL with Rserve
-"Rserve (see [www.rforge.net/Rserve/](https://www.r-project.org)) is a TCP/IP server which allows other programs to use facilities of R (see [www.r-project.org](https://www.r-project.org)) from various languages without the need to initialize R or link against R library. Every connection has a separate workspace and working directory." This is true for Linux and Mac but "Windows lacks important features that make the separation of namespaces possible, therefore Rserve for Windows works in cooperative mode only, that is only one connection at a time is allowed and all subsequent connections share the same namespace." 
+"Rserve (see [www.rforge.net/Rserve/](www.rforge.net/Rserve/)) is a TCP/IP server which allows other programs to use facilities of R (see [www.r-project.org](https://www.r-project.org)) from various languages without the need to initialize R or link against R library. Every connection has a separate workspace and working directory." This is true for Linux and Mac but "Windows lacks important features that make the separation of namespaces possible, therefore Rserve for Windows works in cooperative mode only, that is only one connection at a time is allowed and all subsequent connections share the same namespace." 
 
 
 ## Installation of Rserve
@@ -46,7 +46,7 @@ At this point there is only two functions in use `eval` for evaluation and `set`
   a.value≡(r.eval 'out').value
 1
 ```
-You can find examples in a [rsconnect_test.md](./rsconnect_test.md) file. It includes basically all the same examples than in rconnect (rscproxy-connection.)
+You can find examples in a [rsconnect_test.md](./rsconnect_test.md) file. It includes basically all the same examples than in a rconnect (rscproxy-connection.)
 
 A main element in RSconnect is robject. The tool reads R-structures to Robject and each Robject has `data`-field and `value`(default) and `attributes` properties. I use lowercases because of R.   
 
@@ -124,4 +124,3 @@ You can specify .NET framework and file for `System.Drawings` in the [settings.j
   },
 ```
 In Linux the tool uses shell script to start the Rserve and in Windows .NET, but there is also a backup which uses ⎕CMD.
-
