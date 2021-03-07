@@ -244,12 +244,12 @@
           d←∊{323 ⎕DR ⎕UCS ⍵}¨4 split ii
         :Case XT[⊂'ARRAY_DOUBLE']
           d←∊{⍵≡0 0 0 0 0 0 240 127:⎕NULL  ⍝ infinity
-            ⍵≡0 0 0 0 0 0 240 255:⎕NULL    ⍝ -infinity
-            ⍵≡0 0 0 0 0 0 248 127:⎕NULL    ⍝ NaN
+            ⍵≡0 0 0 0 0 0 240 255:⎕NULL  ⍝ -infinity
+            ⍵≡0 0 0 0 0 0 248 127:⎕NULL  ⍝ NaN
             645 ⎕DR ⎕UCS ⍵}¨8 split ii
         :Case XT[⊂'ARRAY_STR']
           d←{1=≢⍵:⊃⍵ ⋄ ⍵}⎕UCS¨{⍵⊆⍨~⍵∊0}{⍵↓⍨-1+0⍳⍨⌽⍵}ii
-        :Case XT[⊂'ARRAY_BOOL']
+        :Case XT[⊂'ARRAY_BOOL']      ⍝ logical
           d←4↓ii~255 ⋄ ((d∊2)/d)←⎕NULL     ⍝ NA
         :Case XT[⊂'ARRAY_CPLX']
           d←{a←2÷⍨≢⍵ ⋄ (a↑⍵)+(a↓⍵)×¯1*0.5}∊{645 ⎕DR ⎕UCS ⍵}¨8 split ii
