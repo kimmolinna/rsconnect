@@ -239,7 +239,8 @@
         :Case XT[⊂'ARRAY_INT']
             d←∊{323 ⎕DR ⎕UCS ⍵}¨4 split ii
         :Case XT[⊂'ARRAY_DOUBLE']
-            d←∊{645 ⎕DR ⎕UCS ⍵}¨8 split ii
+            d←∊{0 0 0 0 0 0 0 240 127≡⍵:⎕NULL
+            645 ⎕DR ⎕UCS ⍵}¨8 split ii
         :Case XT[⊂'ARRAY_STR']
             d←{1=≢⍵:⊃⍵ ⋄ ⍵}⎕UCS¨{⍵⊆⍨~⍵∊0}{⍵↓⍨-1+0⍳⍨⌽⍵}ii
         :Case XT[⊂'ARRAY_BOOL']      ⍝ logical
