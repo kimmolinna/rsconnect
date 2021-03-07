@@ -4,24 +4,27 @@
     :Field Public data←⍬
     :field private _a←⊂''
     :field private ga←⍬
+
     :property keyed attributes
     :access public
 
     ∇ r←Get args 
-        :if args.IndexersSpecified
-          r←{0=≢⍵:⊂''⋄⍵[ga⍳⊃args.Indexers]}_a
-        :else
-          r←{0=≢⍵:,⊂''⋄ ga{b←⍸~_a∊⊂'' ⋄ ⍺[b]{⍺ ⍵}¨⍵[b]}⍵}_a
-        :endif
-      ∇
+      :if args.IndexersSpecified
+        r←{0=≢⍵:⊂''⋄⍵[ga⍳⊃args.Indexers]}_a
+      :else
+        r←{0=≢⍵:,⊂''⋄ ga{b←⍸~_a∊⊂'' ⋄ ⍺[b]{⍺ ⍵}¨⍵[b]}⍵}_a
+      :endif
+    ∇
+    
     ∇ Set args
-    :if (⊂'')≡_a ⋄ _a←(⊂'')⍴⍨≢ga ⋄ :endif
+      :if (⊂'')≡_a ⋄ _a←(⊂'')⍴⍨≢ga ⋄ :endif
       _a[ga⍳⊃args.Indexers]←args.NewValue
     ∇
     :endproperty
 
     :property default value
     :Access Public
+
     ∇ r←Get args
       r←{1=≢data:,⍵ ⋄ ⍵}{attributes[⊂'class']≡⊂'factor':⍉attributes[⊂'levels'][⍵]
         ∨/( {1=≡⊃⍵:⍵⋄⊃⍵}attributes[⊂'class'])∊⊂'table':⍵{~⊃attributes[⊂'dim']≡⊂'':⍵⍪⍉(⌽⊃attributes[⊂'dim'])⍴⍺⋄ ⍵,[0.5]⍺}⊃attributes[⊂'names']{⍺≢⊂'':⍺⋄⍵}attributes[⊂'dimnames']
@@ -62,6 +65,7 @@
     :field private win←0
     :field private bit64←0
     :field private process←⍬
+    :field private timeout←⍬
 
     prop←{83=⎕dr ⍵:⊂(⍺.name,⊂⍬)[⍺.code⍳⍵] ⋄ (⍺.code,0)[⍺.name⍳⊃⍵]}
 
@@ -99,7 +103,6 @@
     ld←{⍵,⍨3 IntToBytes≢⍵}
     evalOut←{0,⍨DT[⊂'STRING'],ld{⍵↑⍨4×⌈(≢⍵)÷4}10,⍨⎕UCS ⍵}
     strOut←{DT[⊂'STRING'],ld{⍵↑⍨4×⌈(≢⍵)÷4}0,⍨⎕UCS ⍵}
-    headData←{z←DRC.Send CLT(∊{4 IntToBytes ⍵}¨⍺(≢⍵)0 0) ⋄ SendWait ⍵}
 
     ∇ r←kill
       :access public
@@ -112,8 +115,9 @@
     ∇ o←eval s;b;d;dh;hdr;r;s;t;xt;z
       :Access Public
       s←{1=≡⍵:,⊂⍵ ⋄ ⍵}s
-      b←{CMD[⊂'eval'] headData evalOut ⍵}¨s
-      o←{1=≢⍵:⊃⍵ ⋄ ⍵}{(⍵≡,⊂⍬)∨('Err'≡3↑⍵)∨(1=≡⍵)∨1=≢∪¯1↑¨⍕¨⎕dr¨⍵:⍵ ⋄ object ⍵}¨decode¨b
+      b←{CMD[⊂'eval'] {z←DRC.Send CLT(∊{4 IntToBytes ⍵}¨⍺(≢⍵)0 0) ⋄ SendWait ⍵} evalOut ⍵}¨s
+      
+      o←{1=≢⍵:⊃⍵ ⋄ ⍵}⌽{(⍵≡,⊂⍬)∨('Err'≡3↑⍵)∨(1=≡⍵)∨1=≢∪¯1↑¨⍕¨⎕dr¨⍵:⍵ ⋄ object ⍵}¨decode¨b
     ∇
 
 
@@ -143,7 +147,7 @@
     ∇ o←decode i;h;s;xt
       o←⍬ ⋄ h←16↑i ⋄ i←16↓i
       :If 1≠⊃h
-        o←('Error'),⍕⊃ERR[3⊃h] ⋄ →0
+        o←('Error '),⍕{⍬≡⊃⍵:2⊃h⋄⍵}⊃ERR[3⊃h] ⋄ →0
       :endif
 
       :While 0≠≢i
@@ -264,9 +268,9 @@
         ('Send failed: ',,⍕z)⎕SIGNAL 11
       :EndIf
 
-      r←⍬ ⋄ done←0 ⋄ length←¯1
+      o←⍬ ⋄ done←0 ⋄ length←¯1
       :Repeat
-        :If 0=0⊃z←DRC.Wait CLT
+        :If 0=0⊃z←DRC.Wait CLT timeout
           d←3⊃z
           :If length=¯1 ⍝ First block
             length←16+4⊃d
@@ -276,7 +280,8 @@
           :EndIf
           done←length≤⍴o
         :Else
-          ∘ ⍝ Transfer failed
+          done←1
+          o←z
         :EndIf
       :Until done
     ∇
@@ -290,7 +295,8 @@
       error←#.settings.r.error ⋄ command←#.settings.r.command
       sexp←#.settings.r.sexp ⋄ type←#.settings.r.type
       ga←#.settings.r.attributes
-      
+      timeout←#.settings.rserve.timeout
+
       :if (mac⍱win)   ⍝ linux
         :if 0=≢⎕SH'pidof Rserve;exit 0'
           ⎕SH'R CMD Rserve --no-save --RS-port ',(⍕#.settings.rserve.port),' >~/Rserve.log 2>&1'
@@ -322,7 +328,7 @@
 
       :If 0=0⊃z←DRC.Clt'' #.settings.rserve.address #.settings.rserve.port'Raw'⊣step←'Connection'
         CLT←1⊃z
-      :AndIf 0=0⊃z←DRC.Wait CLT 32⊣step←'Wait for confirmation'
+      :AndIf 0=0⊃z←DRC.Wait CLT⊣step←'Wait for confirmation'
       :AndIf 32=≢h←⎕UCS 3⊃z⊣step←'Check R header'
       :AndIf 'Rsrv'≡4↑h⊣step←'Check R header for protocol'
       :AndIf 'QAP1'≡h[8+⍳4]⊣step←'Check R header for transfer protocol'

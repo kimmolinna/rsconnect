@@ -1,7 +1,8 @@
 {
   "rserve":{
     "address": "localhost",
-    "port": 6311
+    "port": 6311,
+    "timeout": 2000
   },
   "dotnet": {
     "framework": "C:/Program Files/dotnet/packs/NETStandard.Library.Ref/2.1.0/ref/netstandard2.1/",
