@@ -4,24 +4,27 @@
     :Field Public data←⍬
     :field private _a←⊂''
     :field private ga←⍬
+
     :property keyed attributes
     :access public
 
     ∇ r←Get args 
-        :if args.IndexersSpecified
-          r←{0=≢⍵:⊂''⋄⍵[ga⍳⊃args.Indexers]}_a
-        :else
-          r←{0=≢⍵:,⊂''⋄ ga{b←⍸~_a∊⊂'' ⋄ ⍺[b]{⍺ ⍵}¨⍵[b]}⍵}_a
-        :endif
-      ∇
+      :if args.IndexersSpecified
+        r←{0=≢⍵:⊂''⋄⍵[ga⍳⊃args.Indexers]}_a
+      :else
+        r←{0=≢⍵:,⊂''⋄ ga{b←⍸~_a∊⊂'' ⋄ ⍺[b]{⍺ ⍵}¨⍵[b]}⍵}_a
+      :endif
+    ∇
+    
     ∇ Set args
-    :if (⊂'')≡_a ⋄ _a←(⊂'')⍴⍨≢ga ⋄ :endif
+      :if (⊂'')≡_a ⋄ _a←(⊂'')⍴⍨≢ga ⋄ :endif
       _a[ga⍳⊃args.Indexers]←args.NewValue
     ∇
     :endproperty
 
     :property default value
     :Access Public
+
     ∇ r←Get args
       r←{1=≢data:,⍵ ⋄ ⍵}{attributes[⊂'class']≡⊂'factor':⍉attributes[⊂'levels'][⍵]
         ∨/( {1=≡⊃⍵:⍵⋄⊃⍵}attributes[⊂'class'])∊⊂'table':⍵{~⊃attributes[⊂'dim']≡⊂'':⍵⍪⍉(⌽⊃attributes[⊂'dim'])⍴⍺⋄ ⍵,[0.5]⍺}⊃attributes[⊂'names']{⍺≢⊂'':⍺⋄⍵}attributes[⊂'dimnames']
@@ -62,6 +65,7 @@
     :field private win←0
     :field private bit64←0
     :field private process←⍬
+    :field private timeout←⍬
 
     prop←{83=⎕dr ⍵:⊂(⍺.name,⊂⍬)[⍺.code⍳⍵] ⋄ (⍺.code,0)[⍺.name⍳⊃⍵]}
 
@@ -99,7 +103,6 @@
     ld←{⍵,⍨3 IntToBytes≢⍵}
     evalOut←{0,⍨DT[⊂'STRING'],ld{⍵↑⍨4×⌈(≢⍵)÷4}10,⍨⎕UCS ⍵}
     strOut←{DT[⊂'STRING'],ld{⍵↑⍨4×⌈(≢⍵)÷4}0,⍨⎕UCS ⍵}
-    headData←{z←DRC.Send CLT(∊{4 IntToBytes ⍵}¨⍺(≢⍵)0 0) ⋄ SendWait ⍵}
 
     ∇ r←kill
       :access public
@@ -112,8 +115,9 @@
     ∇ o←eval s;b;d;dh;hdr;r;s;t;xt;z
       :Access Public
       s←{1=≡⍵:,⊂⍵ ⋄ ⍵}s
-      b←{CMD[⊂'eval'] headData evalOut ⍵}¨s
-      o←{1=≢⍵:⊃⍵ ⋄ ⍵}{(⍵≡,⊂⍬)∨('Err'≡3↑⍵)∨(1=≡⍵)∨1=≢∪¯1↑¨⍕¨⎕dr¨⍵:⍵ ⋄ object ⍵}¨decode¨b
+      b←{CMD[⊂'eval'] {z←DRC.Send CLT(∊{4 IntToBytes ⍵}¨⍺(≢⍵)0 0) ⋄ SendWait ⍵} evalOut ⍵}¨s
+      
+      o←{1=≢⍵:⊃⍵ ⋄ ⍵}⌽{(⍵≡,⊂⍬)∨('Err'≡3↑⍵)∨(1=≡⍵)∨1=≢∪¯1↑¨⍕¨⎕dr¨⍵:⍵ ⋄ object ⍵}¨decode¨b
     ∇
 
 
@@ -143,7 +147,7 @@
     ∇ o←decode i;h;s;xt
       o←⍬ ⋄ h←16↑i ⋄ i←16↓i
       :If 1≠⊃h
-        o←('Error'),⍕⊃ERR[3⊃h] ⋄ →0
+        o←('Error '),⍕{⍬≡⊃⍵:2⊃h⋄⍵}⊃ERR[3⊃h] ⋄ →0
       :endif
 
       :While 0≠≢i
@@ -218,54 +222,55 @@
     ∇
 
     ∇ o←t SEXPin i;a;b;class;d;dh;dim;dt;hdr;ii;in;levels;names;out;row;s;save;st;ty;xt
-      o←⍬ ⋄ d←⍬
+      d←⍬ ⋄ o←t{(⍺≡10)∧0≡+/⍵:∊⎕NULL ⋄ ⍬}i
       :While (0≠≢i)∧(0≠+/i)
         xt←⊃i ⋄ s←(3 b2i i[1 2 3]) ⋄ i←4↓i ⋄ ii←s↑i
         :If 0=≢i ⋄ o←1 ⋄ →0 ⋄ :EndIf
         :Select xt
-        :case 0    
+        :Case 0
         :Case XT[⊂'VECTOR']
           d←⊃xt SEXPin ii
         :Case XT[⊂'SYMNAME']
           d←⎕UCS{⍵/⍨(~⍵∊1)∧⌽∨\~0∊⍨⌽⍵}ii
-        :Caselist XT['LIST_TAG' 'LANG_TAG']  
+        :CaseList XT['LIST_TAG' 'LANG_TAG']
           d←xt SEXPin ii
-            :If t∊128+XT['ARRAY_INT' 'ARRAY_DOUBLE']
-              (a b)←(t-160)⊃(323 4)(645 8)
-              d←d(∊{a ⎕DR ⎕UCS ⍵}¨b split s↓i) ⋄ s←≢i
-            :elseif t∊128+XT[⊂'ARRAY_STR'] 
-              d←d(⎕UCS¨{⍵⊆⍨~⍵∊0}{⍵↓⍨-1+0⍳⍨⌽⍵}s↓i) ⋄ s←≢i
-            :EndIf
+          :If t∊128+XT['ARRAY_INT' 'ARRAY_DOUBLE']
+            (a b)←(t-160)⊃(323 4)(645 8)
+            d←d(∊{a ⎕DR ⎕UCS ⍵}¨b split s↓i) ⋄ s←≢i
+          :ElseIf t∊128+XT[⊂'ARRAY_STR']
+            d←d(⎕UCS¨{⍵⊆⍨~⍵∊0}{⍵↓⍨-1+0⍳⍨⌽⍵}s↓i) ⋄ s←≢i
+          :EndIf
         :Case XT[⊂'ARRAY_INT']
-            d←∊{323 ⎕DR ⎕UCS ⍵}¨4 split ii
+          d←∊{323 ⎕DR ⎕UCS ⍵}¨4 split ii
         :Case XT[⊂'ARRAY_DOUBLE']
-            d←∊{0 0 0 0 0 0 0 240 127≡⍵:⎕NULL
+          d←∊{⍵≡0 0 0 0 0 0 240 127:⎕NULL  ⍝ infinity
+            ⍵≡0 0 0 0 0 0 240 255:⎕NULL    ⍝ -infinity
+            ⍵≡0 0 0 0 0 0 248 127:⎕NULL    ⍝ NaN
             645 ⎕DR ⎕UCS ⍵}¨8 split ii
         :Case XT[⊂'ARRAY_STR']
-            d←{1=≢⍵:⊃⍵ ⋄ ⍵}⎕UCS¨{⍵⊆⍨~⍵∊0}{⍵↓⍨-1+0⍳⍨⌽⍵}ii
-        :Case XT[⊂'ARRAY_BOOL']      ⍝ logical
-            d←4↓ii~255
+          d←{1=≢⍵:⊃⍵ ⋄ ⍵}⎕UCS¨{⍵⊆⍨~⍵∊0}{⍵↓⍨-1+0⍳⍨⌽⍵}ii
+        :Case XT[⊂'ARRAY_BOOL']
+          d←4↓ii~255 ⋄ ((d∊2)/d)←⎕NULL     ⍝ NA
         :Case XT[⊂'ARRAY_CPLX']
-            d←{a←2÷⍨≢⍵ ⋄ (a↑⍵)+(a↓⍵)×¯1*0.5}∊{645 ⎕DR ⎕UCS ⍵}¨8 split ii
-        :Case 128⋄→0
-        :Caselist 128+XT['VECTOR' 'ARRAY_INT' 'ARRAY_DOUBLE' 'ARRAY_STR']   
-            d←xt,(xt SEXPin ii)
+          d←{a←2÷⍨≢⍵ ⋄ (a↑⍵)+(a↓⍵)×¯1*0.5}∊{645 ⎕DR ⎕UCS ⍵}¨8 split ii
+        :Case 128 ⋄ →0
+        :CaseList 128+XT['VECTOR' 'ARRAY_INT' 'ARRAY_DOUBLE' 'ARRAY_STR']
+          d←xt,(xt SEXPin ii)
         :Else
-            ∘
+          ∘
         :EndSelect
 
-        :if 0≠≢d ⋄ o,←⊂d ⋄ i←s↓i ⋄ :endif
-    :EndWhile
+        :If 0≠≢d ⋄ o,←⊂d ⋄ i←s↓i ⋄ :EndIf
+      :EndWhile
     ∇
-
     ∇ o←SendWait d;z;done;length
       :If 0≠0⊃z←DRC.Send CLT d
         ('Send failed: ',,⍕z)⎕SIGNAL 11
       :EndIf
 
-      r←⍬ ⋄ done←0 ⋄ length←¯1
+      o←⍬ ⋄ done←0 ⋄ length←¯1
       :Repeat
-        :If 0=0⊃z←DRC.Wait CLT
+        :If 0=0⊃z←DRC.Wait CLT timeout
           d←3⊃z
           :If length=¯1 ⍝ First block
             length←16+4⊃d
@@ -275,7 +280,8 @@
           :EndIf
           done←length≤⍴o
         :Else
-          ∘ ⍝ Transfer failed
+          done←1
+          o←z
         :EndIf
       :Until done
     ∇
@@ -289,7 +295,8 @@
       error←#.settings.r.error ⋄ command←#.settings.r.command
       sexp←#.settings.r.sexp ⋄ type←#.settings.r.type
       ga←#.settings.r.attributes
-      
+      timeout←#.settings.rserve.timeout
+
       :if (mac⍱win)   ⍝ linux
         :if 0=≢⎕SH'pidof Rserve;exit 0'
           ⎕SH'R CMD Rserve --no-save --RS-port ',(⍕#.settings.rserve.port),' >~/Rserve.log 2>&1'
@@ -321,7 +328,7 @@
 
       :If 0=0⊃z←DRC.Clt'' #.settings.rserve.address #.settings.rserve.port'Raw'⊣step←'Connection'
         CLT←1⊃z
-      :AndIf 0=0⊃z←DRC.Wait CLT 32⊣step←'Wait for confirmation'
+      :AndIf 0=0⊃z←DRC.Wait CLT⊣step←'Wait for confirmation'
       :AndIf 32=≢h←⎕UCS 3⊃z⊣step←'Check R header'
       :AndIf 'Rsrv'≡4↑h⊣step←'Check R header for protocol'
       :AndIf 'QAP1'≡h[8+⍳4]⊣step←'Check R header for transfer protocol'
