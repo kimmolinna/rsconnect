@@ -301,7 +301,7 @@
           ⎕SH'R CMD Rserve --no-save --RS-port ',(⍕#.settings.rserve.port),' >~/Rserve.log 2>&1'
         :endif
       :elseif win 
-        :trap 0
+        :if #.settings.dotnet.use
           ⎕USING←,⊂'System.Diagnostics',',',#.settings.dotnet.framework,#.settings.dotnet.lib 
           si←⎕NEW ProcessStartInfo(⊂#.settings.r.home,'bin\x64\Rserve.exe') 
           si.Arguments←'--slave --RS-port ',⍕#.settings.rserve.port 
@@ -315,7 +315,7 @@
           c,←(⍕#.settings.rserve.port),' >Rserve.log'
           (⊂'@ECHO OFF' c) ⎕NPUT (wf,'Windows\start.bat') 1
           a←⎕cmd (wf,'Windows\start.bat') 'hidden'         
-        :endtrap
+        :endif
       :elseif mac
         ∘ ⍝ my macbook is broken
       :endif

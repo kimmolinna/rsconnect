@@ -5,6 +5,7 @@
     "timeout": 2000
   },
   "dotnet": {
+    "use":1,
     "framework": "C:/Program Files/dotnet/packs/NETStandard.Library.Ref/2.1.0/ref/netstandard2.1/",
     "lib": "System.Diagnostics.Process.dll"
   },
