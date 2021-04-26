@@ -97,7 +97,7 @@
     ∇
     :endproperty
 
-    split←{a←⍺⋄''{0=⍴⍵:⍺ ⋄ ⍺,(⊂a↑⍵)∇(a↓⍵)}⍵}
+    split←{((≢⍵)⍴⍺↑1)⊂⍵} ⍝ thanks VMJ for pimping my code
     IntToBytes←{⎕FR←(⍺=8)⊃645 1287 ⋄ ⍺↑⎕UCS 80 ⎕DR(×⍵)×((2*(8×⍺))-1)⌊|⍵}
     b2i←{(⍺⍴256)⊥⌽⍵}
     ld←{⍵,⍨3 IntToBytes≢⍵}
