@@ -130,13 +130,17 @@
           data,←object in
           in←⍬
         :endIf
-        :while 0≠⍴in
+        :while 0≠≢in
+         :if in≢0
           :if ∨/b←ga∊in[1]
             attr[⍸b]←⊂(⊃in){'row.names'≡⍵:{¯2147483648≡⊃⍵:1+⍳|1⊃⍵⋄⍵}⍺⋄⍺}1⊃in
             in←2↓in
           :else
             data,←{xt∊128+XT[⊂'ARRAY_STR']:⍵⋄⊂⍵}in⋄in←⍬
           :EndIf
+         :else
+            in←⍬
+         :endif
         :EndWhile
       :EndFor
 
@@ -244,7 +248,7 @@
            d←xt SEXPin ii 
         :Case XT[⊂'LANG_NOTAG']
            d←xt SEXPin ii  
-        :Case XT[⊂'UNKNOWN']
+        :Caselist XT[⊂'UNKNOWN'],128+XT[⊂'UNKNOWN']
            →0
         :Case XT[⊂'ARRAY_INT']
           d←∊{323 ⎕DR ⎕UCS ⍵}¨4 split ii
