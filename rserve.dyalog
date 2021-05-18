@@ -239,6 +239,12 @@
           :ElseIf t∊128+XT[⊂'ARRAY_STR']
             d←d(⎕UCS¨{⍵⊆⍨~⍵∊0}{⍵↓⍨-1+0⍳⍨⌽⍵}s↓i) ⋄ s←≢i
           :EndIf
+        :Case XT[⊂'CLOS']
+           d←xt SEXPin ii 
+        :Case XT[⊂'LANG_NOTAG']
+           d←xt SEXPin ii  
+        :Case XT[⊂'UNKNOWN']
+           →0
         :Case XT[⊂'ARRAY_INT']
           d←∊{323 ⎕DR ⎕UCS ⍵}¨4 split ii
         :Case XT[⊂'ARRAY_DOUBLE']
