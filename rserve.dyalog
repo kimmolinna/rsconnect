@@ -158,7 +158,8 @@
 
     ∇ o←s set i;o;d
       :Access public
-      o←⍬ ⋄ (s i)←s{(2>≡⍵)∨((1=≢⍵)∧326=⎕DR ⍵):(,⊂⍺)(,⊂⍵) ⋄ ⍺ ⍵}i
+      i←{(83=⎕dr ⍵)∧0=⍴⍴i:,⍵⋄⍵}i    ⍝ atom
+      o←⍬ ⋄ (s i)←s{((2>≡⍵)∧326≠⎕DR ⍵)∨((1=≢⍵)∧326=⎕DR ⍵):(,⊂⍺)(,⊂⍵) ⋄ ⍺ ⍵}i
       d←s{total←{326=⎕dr ⍵:≢⍵.data ⋄ 0}⍵ ⋄ (strOut ⍺),DT[⊂'SEXP'],ld(SEXPout ⍵)}¨i
       o←⊃¨{z←DRC.Send CLT(∊({4 IntToBytes ⍵}¨CMD[⊂'setSEXP'],(≢⍵)0 0))
         SendWait ⍵}¨d
@@ -309,7 +310,7 @@
       :elseif win 
         :if #.settings.dotnet.use
           ⎕USING←,⊂'System.Diagnostics',',',#.settings.dotnet.framework,#.settings.dotnet.lib 
-          si←⎕NEW ProcessStartInfo(⊂#.settings.r.home,'bin\x64\Rserve.exe') 
+          si←⎕NEW ProcessStartInfo(⊂#.settings.r.home,'Rserve.exe') 
           si.Arguments←'--slave --RS-port ',⍕#.settings.rserve.port 
           si.WindowStyle←ProcessWindowStyle.Hidden 
           si.CreateNoWindow←1 
@@ -317,7 +318,7 @@
         :else
           a←⎕CMD 'taskkill /IM Rserve.exe /F'
           c←'start /b "rserve" ',('/'⎕R'\\') '"',#.settings.r.home
-          c,←'bin\x64\Rserve.exe" --no-save --slave --RS-port '
+          c,←'Rserve.exe" --no-save --slave --RS-port '
           c,←(⍕#.settings.rserve.port),' >Rserve.log'
           (⊂'@ECHO OFF' c) ⎕NPUT (wf,'Windows\start.bat') 1
           a←⎕cmd (wf,'Windows\start.bat') 'hidden'         
