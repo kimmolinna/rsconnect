@@ -131,7 +131,7 @@
           in←⍬
         :endIf
         :while 0≠≢in
-         :if in≢0
+         :if (1<|≡in)∨(1<≢in)
           :if ∨/b←ga∊in[1]
             attr[⍸b]←⊂(⊃in){'row.names'≡⍵:{¯2147483648≡⊃⍵:1+⍳|1⊃⍵⋄⍵}⍺⋄⍺}1⊃in
             in←2↓in
@@ -139,7 +139,7 @@
             data,←{xt∊128+XT[⊂'ARRAY_STR']:⍵⋄⊂⍵}in⋄in←⍬
           :EndIf
          :else
-            in←⍬
+            data,←in ⋄ in←⍬
          :endif
         :EndWhile
       :EndFor
@@ -315,14 +315,14 @@
         :if #.settings.dotnet.use
           ⎕USING←,⊂'System.Diagnostics',',',#.settings.dotnet.framework,#.settings.dotnet.lib 
           si←⎕NEW ProcessStartInfo(⊂#.settings.r.home,'Rserve.exe') 
-          si.Arguments←'--slave --RS-port ',⍕#.settings.rserve.port 
+          si.Arguments←'--slave --RS-workdir ',( ('\\'⎕R '\\\\') wf ) ,' --RS-port ',⍕#.settings.rserve.port 
           si.WindowStyle←ProcessWindowStyle.Hidden 
           si.CreateNoWindow←1 
           process←Process.Start si 
         :else
           a←⎕CMD 'taskkill /IM Rserve.exe /F'
           c←'start /b "rserve" ',('/'⎕R'\\') '"',#.settings.r.home
-          c,←'Rserve.exe" --no-save --slave --RS-port '
+          c,←'Rserve.exe" --no-save --slave --RS-workdir ',( ('\\'⎕R '\\\\') wf ) ,' --RS-port '
           c,←(⍕#.settings.rserve.port),' >Rserve.log'
           (⊂'@ECHO OFF' c) ⎕NPUT (wf,'Windows\start.bat') 1
           a←⎕cmd (wf,'Windows\start.bat') 'hidden'         
