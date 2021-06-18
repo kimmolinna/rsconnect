@@ -29,7 +29,7 @@
               r←{1=≢data:,⍵ ⋄ ⍵}{attributes[⊂'class']≡⊂'factor':⍉attributes[⊂'levels'][⍵]
                   ∨/({1=≡⊃⍵:⍵ ⋄ ⊃⍵}attributes[⊂'class'])∊⊂'table':⍵{~⊃attributes[⊂'dim']≡⊂'':⍵⍪⍉(⌽⊃attributes[⊂'dim'])⍴⍺ ⋄ ⍵,[0.5]⍺}⊃attributes[⊂'names']{⍺≢⊂'':⍺ ⋄ ⍵}attributes[⊂'dimnames']
                   ~attributes[⊂'dim']≡⊂'':⍉(⌽⊃attributes[⊂'dim'])⍴⍵
-                  ∨/({1=≡⊃⍵:⍵ ⋄ ⊃⍵}attributes[⊂'class'])∊⊂'data.table':(⊃attributes[⊂'names'])⍪⍉↑⍵
+                  ∨/({1=≡⊃⍵:⍵ ⋄ ⊃⍵}attributes[⊂'class'])∊⊂'data.table':(⊃attributes[⊂'names']){0≠⍴⍺:⍺⍪⍵⋄⍵}⍉↑⍵
                   ⍉↑{≡⍵:⍵ ⋄ (⊃⍵.attributes[⊂'levels'])[⍵.data]}¨{1=≡⍵:⊂⍵ ⋄ ⍵}⍵
               }data
             ∇
