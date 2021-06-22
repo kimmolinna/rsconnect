@@ -327,21 +327,23 @@
                   ⎕SH'R CMD Rserve --no-save --RS-port ',(⍕#.settings.rserve.port),' >~/Rserve.log 2>&1'
               :EndIf
           :ElseIf win
-              :If #.settings.dotnet.use
-                  ⎕USING←,⊂'System.Diagnostics',',',#.settings.dotnet.framework,#.settings.dotnet.lib
-                  si←⎕NEW ProcessStartInfo(⊂#.settings.r.home,'Rserve.exe')
-                  si.Arguments←'--slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port ',⍕#.settings.rserve.port
-                  si.WindowStyle←ProcessWindowStyle.Hidden
-                  si.CreateNoWindow←1
-                  process←Process.Start si
-              :Else
-                  a←⎕CMD'taskkill /IM Rserve.exe /F'
-                  c←'start /b "rserve" ',('/'⎕R'\\')'"',#.settings.r.home
-                  c,←'Rserve.exe" --no-save --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port '
-                  c,←(⍕#.settings.rserve.port),' >Rserve.log'
-                  (⊂'@ECHO OFF'c)⎕NPUT(wf,'Windows\start.bat')1
-                  a←⎕CMD(wf,'Windows\start.bat')'hidden'
-              :EndIf
+              :if 2>≢⎕CMD 'tasklist /FI "ImageName eq Rserve.exe"'
+                 :If #.settings.dotnet.use
+                    ⎕USING←,⊂'System.Diagnostics',',',#.settings.dotnet.framework,#.settings.dotnet.lib
+                    si←⎕NEW ProcessStartInfo(⊂#.settings.r.home,'Rserve.exe')
+                    si.Arguments←'--slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port ',⍕#.settings.rserve.port
+                    si.WindowStyle←ProcessWindowStyle.Hidden
+                    si.CreateNoWindow←1
+                    process←Process.Start si
+                :Else
+                    a←⎕CMD'taskkill /IM Rserve.exe /F'
+                    c←'start /b "rserve" ',('/'⎕R'\\')'"',#.settings.r.home
+                    c,←'Rserve.exe" --no-save --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port '
+                    c,←(⍕#.settings.rserve.port),' >Rserve.log'
+                    (⊂'@ECHO OFF'c)⎕NPUT(wf,'Windows\start.bat')1
+                    a←⎕CMD(wf,'Windows\start.bat')'hidden'
+                :EndIf
+              :endif
           :ElseIf mac
               ∘ ⍝ my macbook is broken
           :EndIf
