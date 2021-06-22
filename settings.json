@@ -18,7 +18,8 @@
       "row.names",
       "dim",
       "dimnames",
-      "tsp"
+      "tsp",
+      "sorted"
     ],
     "error": [
       {
