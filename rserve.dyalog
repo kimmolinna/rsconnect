@@ -332,17 +332,17 @@
 
             :If #.settings.dotnet.use
                  ⎕USING←,⊂'System.Diagnostics',',',#.settings.dotnet.framework,#.settings.dotnet.lib
-                si←⎕NEW ProcessStartInfo(⊂#.settings.r.home,'Rserve.exe')
-                si.Arguments←'--slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port ',⍕#.settings.rserve.port
+                si←⎕NEW ProcessStartInfo(⊂#.settings.r.home,'R')
+                si.Arguments←'CMD Rserve --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port ',⍕#.settings.rserve.port
                 si.WindowStyle←ProcessWindowStyle.Hidden
                 si.CreateNoWindow←1
                 process←Process.Start si
             :Else
                 c←'start /b "rserve" ',('/'⎕R'\\')'"',#.settings.r.home
-                c,←'Rserve.exe" --no-save --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port '
+                c,←'R" "CMD" "Rserve" --no-save --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port '
                 c,←(⍕#.settings.rserve.port),' >Rserve.log'
-                (⊂'@ECHO OFF'c)⎕NPUT(wf,'Windows\start.bat')1
-                a←⎕CMD(wf,'Windows\start.bat')'hidden'
+                (⊂'@ECHO OFF'c)⎕NPUT(wf,'Windows\rsstart.cmd')1
+                a←⎕CMD(wf,'Windows/rsstart.cmd')'Normal'
             :EndIf
             ⍝ :endif
           :ElseIf mac
@@ -352,7 +352,7 @@
           :If 0=⎕NC'RS.DRC'
               :If 0=⎕NC'#.Conga' ⋄ 'Conga'#.⎕CY'conga' ⋄ :EndIf
               DRC←#.Conga.Init''
-          :EndIf
+          :EndIf                                        
          
           :If 0=0⊃z←DRC.Clt''#.settings.rserve.address #.settings.rserve.port'Raw'⊣step←'Connection'
               CLT←1⊃z
