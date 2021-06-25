@@ -338,6 +338,7 @@
                 si.CreateNoWindow←1
                 process←Process.Start si
             :Else
+                a←⎕CMD 'attrib -R ',wf,'*.* /S'
                 c←'start /b "rserve" ',('/'⎕R'\\')'"',#.settings.r.home
                 c,←'R" "CMD" "Rserve" --no-save --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port '
                 c,←(⍕#.settings.rserve.port),' >Rserve.log'
