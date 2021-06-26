@@ -12,7 +12,8 @@
               :If args.IndexersSpecified
                   r←{0=≢⍵:⊂'' ⋄ ⍵[ga⍳⊃args.Indexers]}_a
               :Else
-                  r←{0=≢⍵:,⊂'' ⋄ ga{b←⍸~_a∊⊂'' ⋄ ⍺[b]{⍺ ⍵}¨⍵[b]}⍵}_a
+                 ⍝ r←{0=≢⍵:,⊂'' ⋄ ga{b←⍸~_a∊⊂'' ⋄ ⍺[b]{⍺ ⍵}¨⍵[b]}⍵}_a
+                  r←(~_a∊⊂'')/ga
               :EndIf
             ∇
 
@@ -263,7 +264,7 @@
               :Case XT[⊂'LANG_NOTAG']
                   d←xt SEXPin ii
               :CaseList XT[⊂'UNKNOWN'],128+XT[⊂'UNKNOWN']
-                  →0
+                   →0 
               :Case XT[⊂'ARRAY_INT']
                   d←∊{323 ⎕DR ⎕UCS ⍵}¨4 split ii
               :Case XT[⊂'ARRAY_DOUBLE']
@@ -278,7 +279,7 @@
               :Case XT[⊂'ARRAY_CPLX']
                   d←{a←2÷⍨≢⍵ ⋄ (a↑⍵)+(a↓⍵)×¯1*0.5}∊{645 ⎕DR ⎕UCS ⍵}¨8 split ii
               :Case 128 ⋄ →0
-              :CaseList 128+XT['VECTOR' 'ARRAY_INT' 'ARRAY_DOUBLE' 'ARRAY_STR']
+              :CaseList 128+XT['S4' 'VECTOR' 'ARRAY_INT' 'ARRAY_DOUBLE' 'ARRAY_STR']
                   d←xt,(xt SEXPin ii)
               :Else
                   ∘
