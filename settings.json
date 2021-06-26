@@ -6,11 +6,11 @@
   },
   "dotnet": {
     "use":1,
-    "framework": "C:/Users/ay29782/dotnet/packs/NETStandard.Library.Ref/2.1.0/ref/netstandard2.1/",
+    "framework": "C:/Program Files/dotnet/packs/NETStandard.Library.Ref/2.1.0/ref/netstandard2.1/",
     "lib": "System.Diagnostics.Process.dll"
   },
   "r": {
-    "home": "C:/Users/ay29782/R-4.0.2/bin/i386/",
+    "home": "C:/Users/kimmo/R-4.1.0/bin/x64/",
     "attributes": [
       "names",
       "class",

@@ -8,18 +8,19 @@ The best way to install Rserve is to install it from a source package which you 
 
 Login with enough privileges to add R packages and run in shell: 
 ```bash
-R CMD INSTALL Rserve_1.8-7.tar.gz
+R CMD INSTALL Rserve_1.8-8.tar.gz
 ```
 ### Windows
 The easiest way to install Rserve is to just copy binaries from [Windows/libs](./Windows/libs) folder to to the directory containing `R.DLL`. 
-In default installation it is `C:/Program Files/R/R-4.0.4/`
+In default installation it is `C:/Program Files/R/R-4.1.0/`
 
 If it's something else you should change it in a [settings.json](./settings.json) file
 
 ```json
 "r": {
-    "home": "C:/Program Files/R/R-4.0.4/",
+    "home": "C:/Program Files/R/R-4.1.0/",
 ```
+You have to set R_`HOME` environmental variable which should point to `\bin`-folder like `C:\Program Files\R\R-4.1.0\bin`
 
 If you want to install Rserve from source you need [Rtools](https://cran.r-project.org/bin/windows/Rtools/) for build R packages with C/C++/Fortran code.
 
@@ -28,13 +29,13 @@ The tool tries to start Rserve automatically so you load it simply by using comm
 ```apl
 ]load rserve.dyalog
 or
-2 ⎕FIX 'file://rserve.dyalog'
+2 ⎕FIX 'file://rserve.dyalog' 
 ```
 And then you are ready to go
 ```apl
 r←⎕NEW #.RS.Rserve
   r.eval 'Hello World!'
-Error  
+Error 1
   r.eval '"Hello World!"'
 Hello World!
 ```
@@ -113,14 +114,16 @@ You can change address and port for Rserve in the [settings.json](./settings.jso
 ```json
  "rserve":{
     "address": "localhost",
-    "port": 6311
+    "port": 6311,
+    "timeout": 2000
   },
 ```
 You can specify .NET framework and file for `System.Drawings` in the [settings.json](./settings.json) file.
 ```json
   "dotnet": {
+    "use": 1,
     "framework": "C:/Program Files/dotnet/packs/NETStandard.Library.Ref/2.1.0/ref/netstandard2.1/",
     "lib": "System.Diagnostics.Process.dll"
   },
 ```
-In Linux the tool uses shell script to start the Rserve and in Windows .NET, but there is also a backup which uses ⎕CMD.
+In Linux the tool uses shell script to start the Rserve and in Windows .NET, but there is also a backup which uses ⎕CMD. In the future I will change the code so that the default way is .NET in all environments.
