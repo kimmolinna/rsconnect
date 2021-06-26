@@ -114,10 +114,10 @@
          
           :EndIf
         ∇
-        ∇ o←eval s;b;d;dh;hdr;r;s;t;xt;z
+        ∇ o←{void}eval s;b;d;dh;hdr;r;s;t;xt;z
           :Access Public
           s←{1=≡⍵:,⊂⍵ ⋄ ⍵}s
-          b←{CMD[⊂'eval']{z←DRC.Send CLT(∊{4 IntToBytes ⍵}¨⍺(≢⍵)0 0) ⋄ SendWait ⍵}evalOut ⍵}¨s
+          b←{CMD[⊂{⍵:{⍵≡0:'voidEval'⋄'eval'}void ⋄ 'eval'}2=⎕NC'void']{z←DRC.Send CLT(∊{4 IntToBytes ⍵}¨⍺(≢⍵)0 0) ⋄ SendWait ⍵}evalOut ⍵}¨s
           o←{1=≢⍵:⊃⍵ ⋄ ⍵}{(⍵≡,⊂⍬)∨('Err'≡3↑⍵)∨(1=≡⍵)∨1=≢∪¯1↑¨⍕¨⎕DR¨⍵:⍵ ⋄ object ⍵}¨decode¨b
         ∇
 
