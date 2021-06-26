@@ -30,7 +30,7 @@
               r←{1=≢data:,⍵ ⋄ ⍵}{attributes[⊂'class']≡⊂'factor':⍉attributes[⊂'levels'][⍵]
                   ∨/({1=≡⊃⍵:⍵ ⋄ ⊃⍵}attributes[⊂'class'])∊⊂'table':⍵{~⊃attributes[⊂'dim']≡⊂'':⍵⍪⍉(⌽⊃attributes[⊂'dim'])⍴⍺ ⋄ ⍵,[0.5]⍺}⊃attributes[⊂'names']{⍺≢⊂'':⍺ ⋄ ⍵}attributes[⊂'dimnames']
                   ~attributes[⊂'dim']≡⊂'':⍉(⌽⊃attributes[⊂'dim'])⍴⍵
-                  ∨/({1=≡⊃⍵:⍵ ⋄ ⊃⍵}attributes[⊂'class'])∊⊂'data.table':(⊃attributes[⊂'names']){0≠⍴⍺:⍺⍪⍵⋄⍵}⍉↑⍵
+                  ∨/({1=≡⊃⍵:⍵ ⋄ ⊃⍵}attributes[⊂'class'])∊⊂'data.frame':(⊃attributes[⊂'names']){0≠⍴⍺:⍺⍪⍵⋄⍵}⍉↑{0::⍵⋄⍵.data}¨⍵
                   ⍉↑{≡⍵:⍵ ⋄ (⊃⍵.attributes[⊂'levels'])[⍵.data]}¨{1=≡⍵:⊂⍵ ⋄ ⍵}⍵
               }data
             ∇

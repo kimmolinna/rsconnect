@@ -19,7 +19,8 @@
       "dim",
       "dimnames",
       "tsp",
-      "sorted"
+      "sorted",
+      "tzone"
     ],
     "error": [
       {
