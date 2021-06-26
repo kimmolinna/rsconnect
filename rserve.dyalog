@@ -119,6 +119,7 @@
           s←{1=≡⍵:,⊂⍵ ⋄ ⍵}s
           b←{CMD[⊂{⍵:{⍵≡0:'voidEval'⋄'eval'}void ⋄ 'eval'}2=⎕NC'void']{z←DRC.Send CLT(∊{4 IntToBytes ⍵}¨⍺(≢⍵)0 0) ⋄ SendWait ⍵}evalOut ⍵}¨s
           o←{1=≢⍵:⊃⍵ ⋄ ⍵}{(⍵≡,⊂⍬)∨('Err'≡3↑⍵)∨(1=≡⍵)∨1=≢∪¯1↑¨⍕¨⎕DR¨⍵:⍵ ⋄ object ⍵}¨decode¨b
+          :if 0=≢o ⋄ ⎕ex 'o' ⋄ :endif
         ∇
 
 
