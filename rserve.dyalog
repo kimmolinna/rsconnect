@@ -333,7 +333,7 @@
             a←⎕CMD'taskkill /IM Rserve.exe /F'
 
             :If #.settings.dotnet.use
-                 ⎕USING←,⊂'System.Diagnostics',',',#.settings.dotnet.framework,#.settings.dotnet.lib
+                 ⎕USING←,⊂'System.Diagnostics,',('/'⎕R'\\')#.settings.dotnet.framework,#.settings.dotnet.lib
                 si←⎕NEW ProcessStartInfo(⊂#.settings.r.home,'R')
                 si.Arguments←'CMD Rserve --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port ',⍕#.settings.rserve.port
                 si.WindowStyle←ProcessWindowStyle.Hidden
@@ -342,10 +342,10 @@
             :Else
                 a←⎕CMD 'attrib -R ',wf,'*.* /S'
                 c←'start /b "rserve" ',('/'⎕R'\\')'"',#.settings.r.home
-                c,←'R" "CMD" "Rserve" --no-save --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port '
+                c,←'R.exe" "CMD" "Rserve" --no-save --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port '
                 c,←(⍕#.settings.rserve.port),' >Rserve.log'
                 (⊂'@ECHO OFF'c)⎕NPUT(wf,'Windows\rsstart.cmd')1
-                a←⎕CMD(wf,'Windows/rsstart.cmd')'Normal'
+                a←⎕CMD(wf,'Windows/rsstart.cmd')'hidden'
             :EndIf
             ⍝ :endif
           :ElseIf mac
