@@ -10,7 +10,7 @@
     "lib": "System.Diagnostics.Process.dll"
   },
   "r": {
-    "home": "C:/Users/kimmo/R-4.1.0/bin/x64/",
+    "home": "C:/Program Files/R/R-4.1.0/bin/x64/",
     "attributes": [
       "names",
       "class",
