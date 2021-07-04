@@ -1,4 +1,60 @@
 ﻿:Namespace RS
+    ∇ r←init
+      wf←⊃⎕NPARTS #.RS{⍺{0=≢⍵:⍺.SALT_Data.SourceFile ⋄ ⍵}' '~⍨⊃⍵{⍵[⍸(⊂⍺){∨/⍺⍷⍵}¨⍵]}⊃¨5176⌶⍬}'rserve.dyalog'
+      #.settings←⎕JSON⊃⎕NGET wf,'settings.json'
+    ∇
+
+    ∇ r←start
+      :Access public    
+      mac win bit64←∨/¨'Mac' 'Windows' '64'⍷¨⊂⊃'.'⎕WG'APLVersion'
+      wf←⊃⎕NPARTS #.RS{⍺{0=≢⍵:⍺.SALT_Data.SourceFile ⋄ ⍵}' '~⍨⊃⍵{⍵[⍸(⊂⍺){∨/⍺⍷⍵}¨⍵]}⊃¨5176⌶⍬}'rserve.dyalog'
+      :if 0=⎕nc '#.settings'⋄ init ⋄ :endif  
+      :If (mac⍱win)   ⍝ linux
+        :If 0=≢⎕SH'pidof Rserve;exit 0'
+          ⎕SH'R CMD Rserve --no-save --RS-port ',(⍕#.settings.rserve.port),' --RS-conf ',wf,'Rserv.conf >~/Rserve.log 2>&1'
+        :EndIf
+      :ElseIf win
+      ⍝ :if 2>≢⎕CMD 'tasklist /FI "ImageName eq Rserve.exe"'
+        a←⎕CMD'taskkill /IM Rserve.exe /F'
+        :If #.settings.dotnet.use
+          ⎕USING←,⊂'System.Diagnostics',',',#.settings.dotnet.framework,#.settings.dotnet.lib
+          si←⎕NEW ProcessStartInfo(⊂#.settings.r.home,'R')
+          si.Arguments←'CMD Rserve --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port ',⍕#.settings.rserve.port
+          si.WindowStyle←ProcessWindowStyle.Hidden
+          si.CreateNoWindow←1
+          process←Process.Start si
+        :Else
+          a←⎕CMD 'attrib -R ',wf,'*.* /S'
+          c←'start /b "rserve" ',('/'⎕R'\\')'"',#.settings.r.home
+          c,←'R" "CMD" "Rserve" --no-save --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port '
+          c,←(⍕#.settings.rserve.port),' >Rserve.log'
+          (⊂'@ECHO OFF'c)⎕NPUT(wf,'Windows\rsstart.cmd')1
+          a←⎕CMD(wf,'Windows/rsstart.cmd')'Normal'
+        :EndIf
+        ⍝ :endif
+      :ElseIf mac
+        ∘ ⍝ my macbook is broken
+      :EndIf     
+    ∇
+
+    ∇ r←kill
+      :Access public
+      mac win bit64←∨/¨'Mac' 'Windows' '64'⍷¨⊂⊃'.'⎕WG'APLVersion'
+      :trap 0
+      :If bit64
+        ⎕SH'kill -9 ',⍕⎕SH'pidof Rserve'
+      :ElseIf win
+        :If win
+            :If ⍬≢process
+                process.Kill''
+             :Else
+                a←⎕CMD'taskkill /IM Rserve.exe /F'
+             :EndIf
+         :EndIf        
+      :EndIf
+      :endtrap
+    ∇
+
     :class robject
         ⎕ML←1 ⋄ ⎕IO←1 ⋄ ⎕PP←34
         :Field Public data←⍬
@@ -107,14 +163,6 @@
         evalOut←{0,⍨DT[⊂'STRING'],ld{⍵↑⍨4×⌈(≢⍵)÷4}10,⍨⎕UCS ⍵}
         strOut←{DT[⊂'STRING'],ld{⍵↑⍨4×⌈(≢⍵)÷4}0,⍨⎕UCS ⍵}
 
-        ∇ r←kill
-          :Access public
-          :If bit64
-              r←⎕SH'kill -9 ',⍕⎕SH'pidof Rserve'
-          :ElseIf win
-         
-          :EndIf
-        ∇
         ∇ o←{void}eval s;b;d;dh;hdr;r;s;t;xt;z
           :Access Public
           s←{1=≡⍵:,⊂⍵ ⋄ ⍵}s
@@ -324,42 +372,14 @@
         ∇ Make;a;b;f;h;out;p;r;rc;step;z;si;c;wf
           :Access public
           :Implements constructor
-          wf←⊃⎕NPARTS #.RS{⍺{0=≢⍵:⍺.SALT_Data.SourceFile ⋄ ⍵}' '~⍨⊃⍵{⍵[⍸(⊂⍺){∨/⍺⍷⍵}¨⍵]}⊃¨5176⌶⍬}'rserve.dyalog'
-          #.settings←⎕JSON⊃⎕NGET wf,'settings.json'
-          mac win bit64←∨/¨'Mac' 'Windows' '64'⍷¨⊂⊃'.'⎕WG'APLVersion'
+          :If 0=⎕NC'#.settings'
+            RS.init
+          :endif
           error←#.settings.r.error ⋄ command←#.settings.r.command
           sexp←#.settings.r.sexp ⋄ type←#.settings.r.type
           ga←#.settings.r.attributes
           timeout←#.settings.rserve.timeout
-         
-          :If (mac⍱win)   ⍝ linux
-              :If 0=≢⎕SH'pidof Rserve;exit 0'
-                  ⎕SH'R CMD Rserve --no-save --RS-port ',(⍕#.settings.rserve.port),' >~/Rserve.log 2>&1'
-              :EndIf
-          :ElseIf win
-            ⍝ :if 2>≢⎕CMD 'tasklist /FI "ImageName eq Rserve.exe"'
-            a←⎕CMD'taskkill /IM Rserve.exe /F'
 
-            :If #.settings.dotnet.use
-                 ⎕USING←,⊂'System.Diagnostics',',',#.settings.dotnet.framework,#.settings.dotnet.lib
-                si←⎕NEW ProcessStartInfo(⊂#.settings.r.home,'R')
-                si.Arguments←'CMD Rserve --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port ',⍕#.settings.rserve.port
-                si.WindowStyle←ProcessWindowStyle.Hidden
-                si.CreateNoWindow←1
-                process←Process.Start si
-            :Else
-                a←⎕CMD 'attrib -R ',wf,'*.* /S'
-                c←'start /b "rserve" ',('/'⎕R'\\')'"',#.settings.r.home
-                c,←'R" "CMD" "Rserve" --no-save --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port '
-                c,←(⍕#.settings.rserve.port),' >Rserve.log'
-                (⊂'@ECHO OFF'c)⎕NPUT(wf,'Windows\rsstart.cmd')1
-                a←⎕CMD(wf,'Windows/rsstart.cmd')'Normal'
-            :EndIf
-            ⍝ :endif
-          :ElseIf mac
-              ∘ ⍝ my macbook is broken
-          :EndIf
-         
           :If 0=⎕NC'RS.DRC'
               :If 0=⎕NC'#.Conga' ⋄ 'Conga'#.⎕CY'conga' ⋄ :EndIf
               DRC←#.Conga.Init''
@@ -380,14 +400,7 @@
         ∇ UnMake;a
           :Implements destructor
           :Trap 0 ⍝ Ignore errors in teardown
-              :If win
-                  :If ⍬≢process
-                      process.Kill''
-                  :Else
-                      a←⎕CMD'taskkill /IM Rserve.exe /F'
-                  :EndIf
-              :EndIf
-              :If 0≠≢DRC.Names'' ⋄ {}DRC.Close¨DRC.Names'' ⋄ :EndIf
+            :If 0≠≢DRC.Names'' ⋄ {}DRC.Close¨DRC.Names'' ⋄ :EndIf
           :EndTrap
         ∇
     :endclass
