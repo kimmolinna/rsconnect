@@ -5,54 +5,54 @@
     ∇
 
     ∇ r←start
-      :Access public    
+      :Access public
       mac win bit64←∨/¨'Mac' 'Windows' '64'⍷¨⊂⊃'.'⎕WG'APLVersion'
       wf←⊃⎕NPARTS #.RS{⍺{0=≢⍵:⍺.SALT_Data.SourceFile ⋄ ⍵}' '~⍨⊃⍵{⍵[⍸(⊂⍺){∨/⍺⍷⍵}¨⍵]}⊃¨5176⌶⍬}'rserve.dyalog'
-      :if 0=⎕nc '#.settings'⋄ init ⋄ :endif  
+      :If 0=⎕NC'#.settings' ⋄ init ⋄ :EndIf
       :If (mac⍱win)   ⍝ linux
-        :If 0=≢⎕SH'pidof Rserve;exit 0'
-          ⎕SH'R CMD Rserve --no-save --RS-port ',(⍕#.settings.rserve.port),' --RS-conf ',wf,'Rserv.conf >~/Rserve.log 2>&1'
-        :EndIf
+          :If 0=≢⎕SH'pidof Rserve;exit 0'
+              ⎕SH'R CMD Rserve --no-save --RS-port ',(⍕#.settings.rserve.port),' --RS-conf ',wf,'Rserv.conf >~/Rserve.log 2>&1'
+          :EndIf
       :ElseIf win
       ⍝ :if 2>≢⎕CMD 'tasklist /FI "ImageName eq Rserve.exe"'
-        a←⎕CMD'taskkill /IM Rserve.exe /F'
-        :If #.settings.dotnet.use
-          ⎕USING←,⊂'System.Diagnostics',',',#.settings.dotnet.framework,#.settings.dotnet.lib
-          si←⎕NEW ProcessStartInfo(⊂#.settings.r.home,'R')
-          si.Arguments←'CMD Rserve --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port ',⍕#.settings.rserve.port
-          si.WindowStyle←ProcessWindowStyle.Hidden
-          si.CreateNoWindow←1
-          process←Process.Start si
-        :Else
-          a←⎕CMD 'attrib -R ',wf,'*.* /S'
-          c←'start /b "rserve" ',('/'⎕R'\\')'"',#.settings.r.home
-          c,←'R" "CMD" "Rserve" --no-save --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port '
-          c,←(⍕#.settings.rserve.port),' >Rserve.log'
-          (⊂'@ECHO OFF'c)⎕NPUT(wf,'Windows\rsstart.cmd')1
-          a←⎕CMD(wf,'Windows/rsstart.cmd')'Normal'
-        :EndIf
+          a←⎕CMD'taskkill /IM Rserve.exe /F'
+          :If #.settings.dotnet.use
+              ⎕USING←,⊂'System.Diagnostics',',',#.settings.dotnet.framework,#.settings.dotnet.lib
+              si←⎕NEW ProcessStartInfo(⊂#.settings.r.home,'R')
+              si.Arguments←'CMD Rserve --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port ',⍕#.settings.rserve.port
+              si.WindowStyle←ProcessWindowStyle.Hidden
+              si.CreateNoWindow←1
+              process←Process.Start si
+          :Else
+              a←⎕CMD'attrib -R ',wf,'*.* /S'
+              c←'start /b "rserve" ',('/'⎕R'\\')'"',#.settings.r.home
+              c,←'R" "CMD" "Rserve" --no-save --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port '
+              c,←(⍕#.settings.rserve.port),' >Rserve.log'
+              (⊂'@ECHO OFF'c)⎕NPUT(wf,'Windows\rsstart.cmd')1
+              a←⎕CMD(wf,'Windows/rsstart.cmd')'Normal'
+          :EndIf
         ⍝ :endif
       :ElseIf mac
-        ∘ ⍝ my macbook is broken
-      :EndIf     
+          ∘ ⍝ my macbook is broken
+      :EndIf
     ∇
 
     ∇ r←kill
       :Access public
       mac win bit64←∨/¨'Mac' 'Windows' '64'⍷¨⊂⊃'.'⎕WG'APLVersion'
-      :trap 0
-      :If bit64
-        ⎕SH'kill -9 ',⍕⎕SH'pidof Rserve'
-      :ElseIf win
-        :If win
-            :If ⍬≢process
-                process.Kill''
-             :Else
-                a←⎕CMD'taskkill /IM Rserve.exe /F'
-             :EndIf
-         :EndIf        
-      :EndIf
-      :endtrap
+      :Trap 0
+          :If bit64
+              ⎕SH'kill -9 ',⍕⎕SH'pidof Rserve'
+          :ElseIf win
+              :If win
+                  :If ⍬≢process
+                      process.Kill''
+                  :Else
+                      a←⎕CMD'taskkill /IM Rserve.exe /F'
+                  :EndIf
+              :EndIf
+          :EndIf
+      :EndTrap
     ∇
 
     :class robject
@@ -86,7 +86,7 @@
               r←{1=≢data:,⍵ ⋄ ⍵}{attributes[⊂'class']≡⊂'factor':⍉attributes[⊂'levels'][⍵]
                   ∨/({1=≡⊃⍵:⍵ ⋄ ⊃⍵}attributes[⊂'class'])∊⊂'table':⍵{~⊃attributes[⊂'dim']≡⊂'':⍵⍪⍉(⌽⊃attributes[⊂'dim'])⍴⍺ ⋄ ⍵,[0.5]⍺}⊃attributes[⊂'names']{⍺≢⊂'':⍺ ⋄ ⍵}attributes[⊂'dimnames']
                   ~attributes[⊂'dim']≡⊂'':⍉(⌽⊃attributes[⊂'dim'])⍴⍵
-                  ∨/({1=≡⊃⍵:⍵ ⋄ ⊃⍵}attributes[⊂'class'])∊⊂'data.frame':(⊃attributes[⊂'names']){0≠⍴⍺:⍺⍪⍵⋄⍵}⍉↑{0::⍵⋄⍵.data}¨⍵
+                  ∨/({1=≡⊃⍵:⍵ ⋄ ⊃⍵}attributes[⊂'class'])∊⊂'data.frame':(⊃attributes[⊂'names']){0≠⍴⍺:⍺⍪⍵ ⋄ ⍵}⍉↑{0::⍵ ⋄ ⍵.data}¨⍵
                   ⍉↑{≡⍵:⍵ ⋄ (⊃⍵.attributes[⊂'levels'])[⍵.data]}¨{1=≡⍵:⊂⍵ ⋄ ⍵}⍵
               }data
             ∇
@@ -166,9 +166,9 @@
         ∇ o←{void}eval s;b;d;dh;hdr;r;s;t;xt;z
           :Access Public
           s←{1=≡⍵:,⊂⍵ ⋄ ⍵}s
-          b←{CMD[⊂{⍵:{⍵≡0:'voidEval'⋄'eval'}void ⋄ 'eval'}2=⎕NC'void']{z←DRC.Send CLT(∊{4 IntToBytes ⍵}¨⍺(≢⍵)0 0) ⋄ SendWait ⍵}evalOut ⍵}¨s
+          b←{CMD[⊂{⍵:{⍵≡0:'voidEval' ⋄ 'eval'}void ⋄ 'eval'}2=⎕NC'void']{z←DRC.Send CLT(∊{4 IntToBytes ⍵}¨⍺(≢⍵)0 0) ⋄ SendWait ⍵}evalOut ⍵}¨s
           o←{1=≢⍵:⊃⍵ ⋄ ⍵}{(⍵≡,⊂⍬)∨('Err'≡3↑⍵)∨(1=≡⍵)∨1=≢∪¯1↑¨⍕¨⎕DR¨⍵:⍵ ⋄ object ⍵}¨decode¨b
-          :if 0=≢o ⋄ ⎕ex 'o' ⋄ :endif
+          :If 0=≢o ⋄ ⎕EX'o' ⋄ :EndIf
         ∇
 
 
@@ -222,18 +222,18 @@
         ∇
 
         ∇ o←{ty}SEXPout i;a;at;b;d;dim;dt;in;ts;ty
-          :If 0=⎕NC'ty'⋄ ty←⎕DR i ⋄ :endif
+          :If 0=⎕NC'ty' ⋄ ty←⎕DR i ⋄ :EndIf
           :Select ty
           :Case 80
-                ty←XT[⊂'ARRAY_STR']
-          :Caselist 83 163 323 
-                ty←XT[⊂'ARRAY_INT'] 
-          :case 645
-                ty←XT[⊂'ARRAY_DOUBLE']
+              ty←XT[⊂'ARRAY_STR']
+          :CaseList 83 163 323
+              ty←XT[⊂'ARRAY_INT']
+          :Case 645
+              ty←XT[⊂'ARRAY_DOUBLE']
           :Case 326
-                :if 80≡⊃∪⎕dr¨i
-                    ty←XT[⊂'ARRAY_STR']
-                :endif 
+              :If 80≡⊃∪⎕DR¨i
+                  ty←XT[⊂'ARRAY_STR']
+              :EndIf
           :EndSelect
          
           :Select ty
@@ -241,9 +241,9 @@
               o←ty,ld{⍵,1⍴⍨4-4|≢⍵}∊{0,⍨⎕UCS ⍵}¨i
           :CaseList XT[⊂'ARRAY_INT']
               :If 1=≢⍴i ⍝ vector
-                  o←XT[⊂'ARRAY_INT'],ld ⎕ucs 80 ⎕dr ⊃0 323 ⎕dr ∊{1=≢⍵:⊃⍵ ⋄ ⍵}i
+                  o←XT[⊂'ARRAY_INT'],ld ⎕UCS 80 ⎕DR⊃0 323 ⎕DR∊{1=≢⍵:⊃⍵ ⋄ ⍵}i
               :Else     ⍝ matrix
-                  dim←⌽⍴i ⋄ d←⎕ucs 80 ⎕dr ⊃0 323 ⎕dr∊i
+                  dim←⌽⍴i ⋄ d←⎕UCS 80 ⎕DR⊃0 323 ⎕DR∊i
                   li←XT[⊂'SYMNAME'],1↓strOut'dim'
                   li←li,⍨XT[⊂'ARRAY_STR'],ld∊4 IntToBytes¨dim
                   li←li,⍨XT[⊂'LIST_TAG'],3 IntToBytes≢li
@@ -313,22 +313,22 @@
                   d←xt SEXPin ii
               :Case XT[⊂'LANG_NOTAG']
                   d←xt SEXPin ii
-              :CaseList XT[⊂'UNKNOWN'],128+XT[⊂'UNKNOWN']            
-                   →0 
+              :CaseList XT[⊂'UNKNOWN'],128+XT[⊂'UNKNOWN']
+                  →0
               :Case XT[⊂'ARRAY_INT']
                   d←∊323 ⎕DR ⎕UCS 4 shape ii
               :Case XT[⊂'ARRAY_DOUBLE']
-                  :trap  11
-                    a←8 shape ii
-                    d←∊645 ⎕DR ⎕UCS a
-                  :else
-                    b←(0 0 0 0 0 0 240 127)⍷a       ⍝ infinity
-                    b∨←(0 0 0 0 0 0 240 255)⍷a      ⍝ -infinity
-                    b∨←(0 0 0 0 0 0 248 127)⍷a      ⍝ NaN
-                    bb←∨/b
-                    d←∊645 ⎕DR ⎕UCS (~bb)⌿a
-                    d←(~bb)\d ⋄ (bb/d)←⎕null
-                  :end
+                  :Trap 11
+                      a←8 shape ii
+                      d←∊645 ⎕DR ⎕UCS a
+                  :Else
+                      b←(0 0 0 0 0 0 240 127)⍷a       ⍝ infinity
+                      b∨←(0 0 0 0 0 0 240 255)⍷a      ⍝ -infinity
+                      b∨←(0 0 0 0 0 0 248 127)⍷a      ⍝ NaN
+                      bb←∨/b
+                      d←∊645 ⎕DR ⎕UCS(~bb)⌿a
+                      d←(~bb)\d ⋄ (bb/d)←⎕NULL
+                  :End
               :Case XT[⊂'ARRAY_STR']
                   d←{1=≢⍵:⊃⍵ ⋄ ⍵}⎕UCS¨{⍵⊆⍨~⍵∊0}{⍵↓⍨-1+0⍳⍨⌽⍵}ii
               :Case XT[⊂'ARRAY_BOOL']      ⍝ logical
@@ -373,17 +373,17 @@
           :Access public
           :Implements constructor
           :If 0=⎕NC'#.settings'
-            RS.init
-          :endif
+              RS.init
+          :EndIf
           error←#.settings.r.error ⋄ command←#.settings.r.command
           sexp←#.settings.r.sexp ⋄ type←#.settings.r.type
           ga←#.settings.r.attributes
           timeout←#.settings.rserve.timeout
-
+         
           :If 0=⎕NC'RS.DRC'
               :If 0=⎕NC'#.Conga' ⋄ 'Conga'#.⎕CY'conga' ⋄ :EndIf
               DRC←#.Conga.Init''
-          :EndIf                                        
+          :EndIf
          
           :If 0=0⊃z←DRC.Clt''#.settings.rserve.address #.settings.rserve.port'Raw'⊣step←'Connection'
               CLT←1⊃z
@@ -400,7 +400,7 @@
         ∇ UnMake;a
           :Implements destructor
           :Trap 0 ⍝ Ignore errors in teardown
-            :If 0≠≢DRC.Names'' ⋄ {}DRC.Close¨DRC.Names'' ⋄ :EndIf
+              :If 0≠≢DRC.Names'' ⋄ {}DRC.Close¨DRC.Names'' ⋄ :EndIf
           :EndTrap
         ∇
     :endclass
