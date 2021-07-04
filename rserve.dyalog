@@ -100,6 +100,7 @@
         :endproperty
 
         split←{((≢⍵)⍴⍺↑1)⊂⍵} ⍝ thanks VMJ for pimping my code
+        shape←{(⍺,⍨(≢⍵)÷⍺)⍴⍵}
         IntToBytes←{⎕FR←(⍺=8)⊃645 1287 ⋄ ⍺↑⎕UCS 80 ⎕DR(×⍵)×((2*(8×⍺))-1)⌊|⍵}
         b2i←{(⍺⍴256)⊥⌽⍵}
         ld←{⍵,⍨3 IntToBytes≢⍵}
@@ -241,7 +242,7 @@
           :EndSelect
         ∇
 
-        ∇ o←t SEXPin i;a;b;class;d;dh;dim;dt;hdr;ii;in;levels;names;out;row;s;save;st;ty;xt
+        ∇ o←t SEXPin i;a;b;class;d;dh;dim;dt;hdr;ii;in;levels;names;out;row;s;save;st;ty;xt;bb
           d←⍬ ⋄ o←t{(⍺≡10)∧0≡+/⍵:∊⎕NULL ⋄ ⍬}i
           :While (0≠≢i)∧(0≠+/i)
               xt←⊃i ⋄ s←(3 b2i i[1 2 3]) ⋄ i←4↓i ⋄ ii←s↑i
@@ -256,7 +257,7 @@
                   d←xt SEXPin ii
                   :If t∊128+XT['ARRAY_INT' 'ARRAY_DOUBLE']
                       (a b)←(t-160)⊃(323 4)(645 8)
-                      d←d(∊{a ⎕DR ⎕UCS ⍵}¨b split s↓i) ⋄ s←≢i
+                      d←d(∊a ⎕DR ⎕UCS b shape s↓i) ⋄ s←≢i
                   :ElseIf t∊128+XT[⊂'ARRAY_STR']
                       d←d(⎕UCS¨{⍵⊆⍨~⍵∊0}{⍵↓⍨-1+0⍳⍨⌽⍵}s↓i) ⋄ s←≢i
                   :EndIf
@@ -264,21 +265,28 @@
                   d←xt SEXPin ii
               :Case XT[⊂'LANG_NOTAG']
                   d←xt SEXPin ii
-              :CaseList XT[⊂'UNKNOWN'],128+XT[⊂'UNKNOWN']
+              :CaseList XT[⊂'UNKNOWN'],128+XT[⊂'UNKNOWN']            
                    →0 
               :Case XT[⊂'ARRAY_INT']
-                  d←∊{323 ⎕DR ⎕UCS ⍵}¨4 split ii
+                  d←∊323 ⎕DR ⎕UCS 4 shape ii
               :Case XT[⊂'ARRAY_DOUBLE']
-                  d←∊{⍵≡0 0 0 0 0 0 240 127:⎕NULL  ⍝ infinity
-                      ⍵≡0 0 0 0 0 0 240 255:⎕NULL  ⍝ -infinity
-                      ⍵≡0 0 0 0 0 0 248 127:⎕NULL  ⍝ NaN
-                      645 ⎕DR ⎕UCS ⍵}¨8 split ii
+                  :trap  11
+                    a←8 shape ii
+                    d←∊645 ⎕DR ⎕UCS a
+                  :else
+                    b←(0 0 0 0 0 0 240 127)⍷a       ⍝ infinity
+                    b∨←(0 0 0 0 0 0 240 255)⍷a      ⍝ -infinity
+                    b∨←(0 0 0 0 0 0 248 127)⍷a      ⍝ NaN
+                    bb←∨/b
+                    d←∊645 ⎕DR ⎕UCS (~bb)⌿a
+                    d←(~bb)\d ⋄ (bb/d)←⎕null
+                  :end
               :Case XT[⊂'ARRAY_STR']
                   d←{1=≢⍵:⊃⍵ ⋄ ⍵}⎕UCS¨{⍵⊆⍨~⍵∊0}{⍵↓⍨-1+0⍳⍨⌽⍵}ii
               :Case XT[⊂'ARRAY_BOOL']      ⍝ logical
                   d←4↓ii~255 ⋄ ((d∊2)/d)←⎕NULL     ⍝ NA
               :Case XT[⊂'ARRAY_CPLX']
-                  d←{a←2÷⍨≢⍵ ⋄ (a↑⍵)+(a↓⍵)×¯1*0.5}∊{645 ⎕DR ⎕UCS ⍵}¨8 split ii
+                  d←{a←2÷⍨≢⍵ ⋄ (a↑⍵)+(a↓⍵)×¯1*0.5}∊645 ⎕DR ⎕UCS 8 shape ii
               :Case 128 ⋄ →0
               :CaseList 128+XT['S4' 'VECTOR' 'ARRAY_INT' 'ARRAY_DOUBLE' 'ARRAY_STR']
                   d←xt,(xt SEXPin ii)
