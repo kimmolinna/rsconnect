@@ -12,7 +12,7 @@ R CMD INSTALL Rserve_1.8-8.tar.gz
 ```
 ### Windows
 The easiest way to install Rserve is to just copy binaries from [Windows/libs](./Windows/libs) folder to to the directory containing `R.DLL`. 
-In default installation it is `C:/Program Files/R/R-4.1.0/`
+In the default installation the folder is `C:/Program Files/R/R-4.1.0/`
 
 If it's something else you should change it in a [settings.json](./settings.json) file
 
@@ -20,7 +20,7 @@ If it's something else you should change it in a [settings.json](./settings.json
 "r": {
     "home": "C:/Program Files/R/R-4.1.0/",
 ```
-You have to set R_`HOME` environmental variable which should point to `\bin`-folder like `C:\Program Files\R\R-4.1.0\bin`
+You have to set `R_HOME` environmental variable which should point to `\bin`-folder like `C:\Program Files\R\R-4.1.0\bin`
 
 If you want to install Rserve from source you need [Rtools](https://cran.r-project.org/bin/windows/Rtools/) for build R packages with C/C++/Fortran code.
 
@@ -30,6 +30,10 @@ The tool tries to start Rserve automatically so you load it simply by using comm
 ]load rserve.dyalog
 or
 2 ⎕FIX 'file://rserve.dyalog' 
+```
+Then you should start a Rserve TCP/IP server. You can do this manually or by using the command
+```apl
+RS.start
 ```
 And then you are ready to go
 ```apl
@@ -55,13 +59,14 @@ A main element in RSconnect is robject. The tool reads R-structures to Robject a
   r.eval 'iris'
 #.[Rserve].[robject]
   (r.eval 'iris')[⍳3;]
-┌───┬───┬───┬───┬──────┐
-│5.1│3.5│1.4│0.2│setosa│
-├───┼───┼───┼───┼──────┤
-│4.9│3  │1.4│0.2│setosa│
-├───┼───┼───┼───┼──────┤
-│4.7│3.2│1.3│0.2│setosa│
-└───┴───┴───┴───┴──────┘
+ (r.eval'iris')[⍳3;]
+┌────────────┬───────────┬────────────┬───────────┬───────┐
+│Sepal.Length│Sepal.Width│Petal.Length│Petal.Width│Species│
+├────────────┼───────────┼────────────┼───────────┼───────┤
+│5.1         │3.5        │1.4         │0.2        │setosa │
+├────────────┼───────────┼────────────┼───────────┼───────┤
+│4.9         │3          │1.4         │0.2        │setosa │
+└────────────┴───────────┴────────────┴───────────┴───────┘
 ```
 You can create robjecct quite easily by yourself and then use R for example for summaries.
 ```apl
@@ -71,13 +76,9 @@ mydf.data←↓[1]((⍳12)∘.*1 2)
 'mydf' r.set mydf 
 1
   mydf.attributes[]
-┌───────────────────┬──────────────────┐
-│┌─────┬───────────┐│┌─────┬──────────┐│
-││names│┌──┬──────┐│││class│data.frame││
-││     ││xx│square│││└─────┴──────────┘│
-││     │└──┴──────┘││                  │
-│└─────┴───────────┘│                  │
-└───────────────────┴──────────────────┘
+┌─────┬─────┐
+│names│class│
+└─────┴─────┘
   mydf.attributes[⊂'class']
 ┌──────────┐
 │data.frame│

@@ -86,8 +86,8 @@
               r←{1=≢data:,⍵ ⋄ ⍵}{attributes[⊂'class']≡⊂'factor':⍉attributes[⊂'levels'][⍵]
                   ∨/({1=≡⊃⍵:⍵ ⋄ ⊃⍵}attributes[⊂'class'])∊⊂'table':⍵{~⊃attributes[⊂'dim']≡⊂'':⍵⍪⍉(⌽⊃attributes[⊂'dim'])⍴⍺ ⋄ ⍵,[0.5]⍺}⊃attributes[⊂'names']{⍺≢⊂'':⍺ ⋄ ⍵}attributes[⊂'dimnames']
                   ~attributes[⊂'dim']≡⊂'':⍉(⌽⊃attributes[⊂'dim'])⍴⍵
-                  ∨/({1=≡⊃⍵:⍵ ⋄ ⊃⍵}attributes[⊂'class'])∊⊂'data.frame':(⊃attributes[⊂'names']){0≠⍴⍺:⍺⍪⍵ ⋄ ⍵}⍉↑{0::⍵ ⋄ ⍵.data}¨⍵
-                  ⍉↑{≡⍵:⍵ ⋄ (⊃⍵.attributes[⊂'levels'])[⍵.data]}¨{1=≡⍵:⊂⍵ ⋄ ⍵}⍵
+                  attributes[⊂'class']≡⊂'ts':(↑(⍴⍵)↑,↑{(⊂⍳⍵[3]){⍵,¨⍺}¨⍵[1],⍵[1]+⍳⌊(⍵[2]-⍵[1])}⊃attributes[⊂'tsp']),⍵
+                  ∨/({1=≡⊃⍵:⍵ ⋄ ⊃⍵}attributes[⊂'class'])∊⊂'data.frame':(⊃attributes[⊂'names']){0≠⍴⍺:⍺⍪⍵ ⋄ ⍵}⍉↑{⎕IO←1⋄0::⍵ ⋄ (⊃⍵.attributes[⊂'levels'])[⍵.data]}¨{1=≡⍵:⊂⍵ ⋄ ⍵}⍵
               }data
             ∇
         :endproperty
@@ -258,7 +258,7 @@
                   d←SEXPout¨{1=≡⍵:,⊂⍵ ⋄ ⍵}i.data
               :EndIf
          
-              at←i.attributes[]
+              at←↓{⍵,[0.5]i.attributes[⍵]}i.attributes[]
          
               :If (⊂'')≢i.attributes[⊂'row.names']
               :AndIf {⎕IO←1 ⋄ ⍵≡⍳¯1↑⍵}⊃i.attributes[⊂'row.names']

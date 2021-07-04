@@ -1,14 +1,14 @@
 Linux:
 ```apl
-]load /home/kimmo/dyalog/rserve/rserve.dyalog
+]load /home/kimmo/rsconnect/rserve.dyalog
 or
-2 ⎕FIX 'file:///home/kimmo/dyalog/rserve/rserve.dyalog'
+2 ⎕FIX 'file:///home/kimmo/rsconnect/rserve.dyalog'
 ```
 Windows:
 ```apl
-]load '/users/kimmo/onedrive/asiakirjat/github/rserve/rserve.dyalog'
+]load '/users/kimmo/onedrive/asiakirjat/github/rsconnect/rserve.dyalog'
 or
-2 ⎕FIX 'file:///users/kimmo/onedrive/asiakirjat/github/rserve/rserve.dyalog'
+2 ⎕FIX 'file:///users/kimmo/onedrive/asiakirjat/github/rsconnect/rserve.dyalog'
 ```
 A test set:
 ```apl
@@ -32,16 +32,14 @@ r.eval expr
 r.eval 'graphics.off()'
 co2←r.eval 'co2'
 co2.attributes[]
-↑co2.attributes[]
 co2.attributes[⊂'class']
 co2.attributes[⊂'tsp']  
-8↑co2.value
-co2[2 4 6]
+co2.value[⍳8;]
 r.eval 'age <-18:20'
 'height' r.set (76.1 77 78.1)
 v←r.eval 'village <-data.frame(age=age,height=height)'
 v.attributes[]
-↑v.attributes[]
+v[;]
 v.value
 obj←⎕new #.RS.robject
 obj.attributes['tsp' 'class']←(2014(2014+11÷12)12) 'ts'
@@ -75,17 +73,17 @@ r.eval 'c(1,2,3)*c(10,20,30)'
 5  6  7  8
 9 10 11 12
 1⍕10↑normAPL←r.eval 'rnorm(1000,100,1)'
- 99.9 99.5 98.6 100.8 100.4 100.5 98.9 99.8 99.1 99.9
+ 100.1 98.6 100.3 101.0 99.6 100.5 97.3 98.0 99.7 99.6
 'normR' r.set normAPL
 1
 1⍕10↑r.eval 'normR'
- 99.9 99.5 98.6 100.8 100.4 100.5 98.9 99.8 99.1 99.9
+ 100.1 98.6 100.3 101.0 99.6 100.5 97.3 98.0 99.7 99.6
 (r.eval 'summary(normR)').value
-┌───────────┬───────────┬───────────┬───────────┬───────────┬───────────┐
-│Min.       │1st Qu.    │Median     │Mean       │3rd Qu.    │Max.       │
-├───────────┼───────────┼───────────┼───────────┼───────────┼───────────┤
-│96.33068387│99.26926846│99.97939797│99.95441358│100.6525874│103.4745601│
-└───────────┴───────────┴───────────┴───────────┴───────────┴───────────┘
+┌───────────┬───────────┬───────────┬──────────┬───────────┬───────────┐
+│Min.       │1st Qu.    │Median     │Mean      │3rd Qu.    │Max.       │
+├───────────┼───────────┼───────────┼──────────┼───────────┼───────────┤
+│96.16940257│99.30228086│100.0571833│100.032433│100.7173424│102.9860109│
+└───────────┴───────────┴───────────┴──────────┴───────────┴───────────┘
 x←¯10 10 {⍺[1]++\0,⍵⍴(|-/⍺)÷⍵} 50
 z←x∘.{{10×(1○⍵)÷⍵}((⍺*2)+⍵*2)*.5}x
 ('x' 'z') r.set (x z)
@@ -95,20 +93,12 @@ expr,←'xlab="X",ylab="Y",zlab="Z")'
 r.eval expr
 #.[Rserve].[robject]
 r.eval 'graphics.off()'
-
+[Null]
 co2←r.eval 'co2'
 co2.attributes[]
-┌──────────┬─────────────────────────┐
-│┌─────┬──┐│┌───┬───────────────────┐│
-││class│ts│││tsp│1959 1997.916667 12││
-│└─────┴──┘│└───┴───────────────────┘│
-└──────────┴─────────────────────────┘
-↑co2.attributes[]
-┌─────┬───────────────────┐
-│class│ts                 │
-├─────┼───────────────────┤
-│tsp  │1959 1997.916667 12│
-└─────┴───────────────────┘
+┌─────┬───┐
+│class│tsp│
+└─────┴───┘
 co2.attributes[⊂'class']
 ┌──┐
 │ts│
@@ -117,37 +107,44 @@ co2.attributes[⊂'tsp']
 ┌───────────────────┐
 │1959 1997.916667 12│
 └───────────────────┘
-8↑co2.value
-315.42 316.31 316.5 317.56 318.13 318 316.39 314.65
-co2[2 4 6]
-316.31 317.56 318
+co2.value[⍳8;]
+1959 1 315.42
+1959 2 316.31
+1959 3 316.5 
+1959 4 317.56
+1959 5 318.13
+1959 6 318   
+1959 7 316.39
+1959 8 314.65
 r.eval 'age <-18:20'
 18 19 20
 'height' r.set (76.1 77 78.1)
 1
 v←r.eval 'village <-data.frame(age=age,height=height)'
 v.attributes[]
-┌────────────────────┬──────────────────┬─────────────────┐
-│┌─────┬────────────┐│┌─────┬──────────┐│┌─────────┬─────┐│
-││names│┌───┬──────┐│││class│data.frame│││row.names│1 2 3││
-││     ││age│height│││└─────┴──────────┘│└─────────┴─────┘│
-││     │└───┴──────┘││                  │                 │
-│└─────┴────────────┘│                  │                 │
-└────────────────────┴──────────────────┴─────────────────┘
-↑v.attributes[]
-┌─────────┬────────────┐
-│names    │┌───┬──────┐│
-│         ││age│height││
-│         │└───┴──────┘│
-├─────────┼────────────┤
-│class    │data.frame  │
-├─────────┼────────────┤
-│row.names│1 2 3       │
-└─────────┴────────────┘
+┌─────┬─────┬─────────┐
+│names│class│row.names│
+└─────┴─────┴─────────┘
+v[;]
+┌───┬──────┐
+│age│height│
+├───┼──────┤
+│18 │76.1  │
+├───┼──────┤
+│19 │77    │
+├───┼──────┤
+│20 │78.1  │
+└───┴──────┘
 v.value
-18 76.1
-19 77  
-20 78.1
+┌───┬──────┐
+│age│height│
+├───┼──────┤
+│18 │76.1  │
+├───┼──────┤
+│19 │77    │
+├───┼──────┤
+│20 │78.1  │
+└───┴──────┘
 obj←⎕new #.RS.robject
 obj.attributes['tsp' 'class']←(2014(2014+11÷12)12) 'ts'
 obj.data←?12⍴100
@@ -157,7 +154,7 @@ obj.data←?12⍴100
 ┌────┬───────┬──────┬───────────┬───────┬────┐
 │Min.│1st Qu.│Median│Mean       │3rd Qu.│Max.│
 ├────┼───────┼──────┼───────────┼───────┼────┤
-│2   │13     │41.5  │41.08333333│61.5   │92  │
+│5   │24     │50.5  │48.58333333│75.5   │84  │
 └────┴───────┴──────┴───────────┴───────┴────┘
 mydf←⎕new #.RS.robject
 mydf.attributes['class' 'names']←'data.frame' ('xx' 'square')
@@ -184,5 +181,5 @@ a←r.eval'iris'
 'out' r.set a
 1
 a.value≡(r.eval 'out').value
-1
+1   
 ```
