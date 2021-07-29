@@ -17,7 +17,7 @@
       ⍝ :if 2>≢⎕CMD 'tasklist /FI "ImageName eq Rserve.exe"'
           a←⎕CMD'taskkill /IM Rserve.exe /F'
           :If #.settings.dotnet.use
-              ⎕USING←,⊂'System.Diagnostics',',',#.settings.dotnet.framework,#.settings.dotnet.lib
+              ⎕USING←,⊂'System.Diagnostics',',',(('/'⎕R'\\')#.settings.dotnet.framework,#.settings.dotnet.lib)
               si←⎕NEW ProcessStartInfo(⊂#.settings.r.home,'R')
               si.Arguments←'CMD Rserve --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port ',⍕#.settings.rserve.port
               si.WindowStyle←ProcessWindowStyle.Hidden

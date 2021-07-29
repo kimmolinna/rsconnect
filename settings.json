@@ -2,7 +2,7 @@
   "rserve":{
     "address": "localhost",
     "port": 6311,
-    "timeout": 2000
+    "timeout": 4000
   },
   "dotnet": {
     "use":1,
