@@ -291,7 +291,7 @@
         ∇
 
         ∇ o←t SEXPin i;a;b;class;d;dh;dim;dt;hdr;ii;in;levels;names;out;row;s;save;st;ty;xt;bb
-          d←⍬ ⋄ o←t{(⍺≡10)∧0≡+/⍵:∊⎕NULL ⋄ ⍬}i
+          d←⍬ ⋄ o←t{(⍺≡10)∧0≡+/⍵:⎕NULL ⋄ ⍬}i
           :While (0≠≢i)∧(0≠+/i)
               xt←⊃i ⋄ s←(3 b2i i[1 2 3]) ⋄ i←4↓i ⋄ ii←s↑i
               :If 0=≢i ⋄ o←1 ⋄ →0 ⋄ :EndIf
@@ -325,6 +325,7 @@
                       b←(0 0 0 0 0 0 240 127)⍷a       ⍝ infinity
                       b∨←(0 0 0 0 0 0 240 255)⍷a      ⍝ -infinity
                       b∨←(0 0 0 0 0 0 248 127)⍷a      ⍝ NaN
+                      b∨←(162 7 0 0 0 0 240 127)⍷a    ⍝ NA_real_ 
                       bb←∨/b
                       d←∊645 ⎕DR ⎕UCS(~bb)⌿a
                       d←(~bb)\d ⋄ (bb/d)←⎕NULL
@@ -334,7 +335,18 @@
               :Case XT[⊂'ARRAY_BOOL']      ⍝ logical
                   d←4↓ii~255 ⋄ ((d∊2)/d)←⎕NULL     ⍝ NA
               :Case XT[⊂'ARRAY_CPLX']
-                  d←{a←2÷⍨≢⍵ ⋄ (a↑⍵)+(a↓⍵)×¯1*0.5}∊645 ⎕DR ⎕UCS 8 shape ii
+                  :Trap 11
+                      a←8 shape ii
+                      d←∊645 ⎕DR ⎕UCS a
+                  :Else
+                      b←(0 0 0 0 0 0 240 127)⍷a       ⍝ infinity
+                      b∨←(0 0 0 0 0 0 240 255)⍷a      ⍝ -infinity
+                      b∨←(0 0 0 0 0 0 248 127)⍷a      ⍝ NaN
+                      b∨←(162 7 0 0 0 0 240 127)⍷a    ⍝ NA_real_/NA_complex_ 
+                      bb←∨/b
+                      d←{a←2÷⍨≢⍵ ⋄ (a↑⍵)+(a↓⍵)×¯1*0.5}∊645 ⎕DR ⎕UCS(~bb)⌿a
+                      d←(~bb)\d ⋄ (bb/d)←⎕NULL
+                  :End
               :Case 128 ⋄ →0
               :CaseList 128+XT['S4' 'VECTOR' 'ARRAY_INT' 'ARRAY_DOUBLE' 'ARRAY_STR']
                   d←xt,(xt SEXPin ii)
