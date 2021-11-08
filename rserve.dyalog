@@ -20,7 +20,7 @@
               ⎕USING←,⊂'System.Diagnostics',',',(('/'⎕R'\\')#.settings.dotnet.framework,#.settings.dotnet.lib)
               si←⎕NEW ProcessStartInfo(⊂#.settings.r.home,'R')
               si.Arguments←'CMD Rserve --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port ',⍕#.settings.rserve.port
-              si.WindowStyle←ProcessWindowStyle.Hidden
+              si.WindowStyle←1  ⍝ ProcessWindowStyle.Hidden
               si.CreateNoWindow←1
               process←Process.Start si
           :Else
