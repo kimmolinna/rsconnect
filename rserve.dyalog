@@ -4,7 +4,7 @@
       #.settings←⎕JSON⊃⎕NGET wf,'settings.json'
     ∇
 
-    ∇ r←start
+    ∇ r←start;a;o
       :Access public
       mac win bit64←∨/¨'Mac' 'Windows' '64'⍷¨⊂⊃'.'⎕WG'APLVersion'
       wf←⊃⎕NPARTS #.RS{⍺{0=≢⍵:⍺.SALT_Data.SourceFile ⋄ ⍵}' '~⍨⊃⍵{⍵[⍸(⊂⍺){∨/⍺⍷⍵}¨⍵]}⊃¨5176⌶⍬}'rserve.dyalog'
@@ -14,8 +14,13 @@
               ⎕SH'R CMD Rserve --no-save --RS-port ',(⍕#.settings.rserve.port),' --RS-conf ',wf,'Rserv.conf >~/Rserve.log 2>&1'
           :EndIf
       :ElseIf win
-      ⍝ :if 2>≢⎕CMD 'tasklist /FI "ImageName eq Rserve.exe"'
+      :if 2>≢⎕CMD 'tasklist /FI "ImageName eq Rserve.exe"'
           a←⎕CMD'taskkill /IM Rserve.exe /F'
+          o←⊂'library(Rserve)' 
+          o,←⊂'Rserve(args="--no-save --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port ',(⍕#.settings.rserve.port),' >Rserve.log")'
+          (⊂o) ⎕NPUT (wf,'rserve.r') 1
+          a←⎕CMD(('/'⎕R'\\')'"',#.settings.r.home,'R.exe" CMD BATCH ',wf,'rserve.r') 'Hidden'
+        →0
           :If #.settings.dotnet.use
               ⎕USING←,⊂'System.Diagnostics',',',(('/'⎕R'\\')#.settings.dotnet.framework,#.settings.dotnet.lib)
               si←⎕NEW ProcessStartInfo(⊂#.settings.r.home,'R')
@@ -31,7 +36,7 @@
               (⊂'@ECHO OFF'c)⎕NPUT(wf,'Windows\rsstart.cmd')1
               a←⎕CMD(wf,'Windows/rsstart.cmd')'Normal'
           :EndIf
-        ⍝ :endif
+        :endif
       :ElseIf mac
           ∘ ⍝ my macbook is broken
       :EndIf
