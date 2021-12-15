@@ -1,2 +1,2 @@
 library(Rserve)
-Rserve(args="--no-save --slave --RS-workdir d:\\onedrive\\rsconnect\\ --RS-port 6311 >Rserve.log")
+Rserve(args="--no-save --RS-port 6311 --RS-conf /home/kimmo/rsconnect/Rserv.conf >~/Rserve.log")

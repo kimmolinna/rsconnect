@@ -4,11 +4,6 @@
     "port": 6311,
     "timeout": 4000
   },
-  "dotnet": {
-    "use":1,
-    "framework": "C:/Program Files/dotnet/packs/NETStandard.Library.Ref/2.1.0/ref/netstandard2.1/",
-    "lib": "System.Diagnostics.Process.dll"
-  },
   "r": {
     "home": "C:/Program Files/R/R-4.1.2/bin/x64/",
     "attributes": [

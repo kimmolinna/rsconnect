@@ -11,32 +11,19 @@
       :If 0=⎕NC'#.settings' ⋄ init ⋄ :EndIf
       :If (mac⍱win)   ⍝ linux
           :If 0=≢⎕SH'pidof Rserve;exit 0'
-              ⎕SH'R CMD Rserve --no-save --RS-port ',(⍕#.settings.rserve.port),' --RS-conf ',wf,'Rserv.conf >~/Rserve.log 2>&1'
+              o←⊂'library(Rserve)'
+              o,←⊂'Rserve(args="--no-save --RS-port ',(⍕#.settings.rserve.port),' --RS-conf ',wf,'Rserv.conf >~/Rserve.log")'
+              (⊂o)⎕NPUT(wf,'rserve.r')1
+              ⎕SH'R CMD BATCH ',wf,'rserve.r'
           :EndIf
       :ElseIf win
-      :if 2>≢⎕CMD 'tasklist /FI "ImageName eq Rserve.exe"'
-          a←⎕CMD'taskkill /IM Rserve.exe /F'
-          o←⊂'library(Rserve)' 
-          o,←⊂'Rserve(args="--no-save --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port ',(⍕#.settings.rserve.port),' >Rserve.log")'
-          (⊂o) ⎕NPUT (wf,'rserve.r') 1
-          a←⎕CMD(('/'⎕R'\\')'"',#.settings.r.home,'R.exe" CMD BATCH ',wf,'rserve.r') 'Hidden'
-        →0
-          :If #.settings.dotnet.use
-              ⎕USING←,⊂'System.Diagnostics',',',(('/'⎕R'\\')#.settings.dotnet.framework,#.settings.dotnet.lib)
-              si←⎕NEW ProcessStartInfo(⊂#.settings.r.home,'R')
-              si.Arguments←'CMD Rserve --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port ',⍕#.settings.rserve.port
-              si.WindowStyle←1  ⍝ ProcessWindowStyle.Hidden
-              si.CreateNoWindow←1
-              process←Process.Start si
-          :Else
-              a←⎕CMD'attrib -R ',wf,'*.* /S'
-              c←'start /b "rserve" ',('/'⎕R'\\')'"',#.settings.r.home
-              c,←'R" "CMD" "Rserve" --no-save --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port '
-              c,←(⍕#.settings.rserve.port),' >Rserve.log'
-              (⊂'@ECHO OFF'c)⎕NPUT(wf,'Windows\rsstart.cmd')1
-              a←⎕CMD(wf,'Windows/rsstart.cmd')'Normal'
+          :If 2>≢⎕CMD'tasklist /FI "ImageName eq Rserve.exe"'
+            ⍝ a←⎕CMD'taskkill /IM Rserve.exe /F'
+              o←⊂'library(Rserve)'
+              o,←⊂'Rserve(args="--no-save --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port ',(⍕#.settings.rserve.port),' >Rserve.log")'
+              (⊂o)⎕NPUT(wf,'rserve.r')1
+              a←⎕CMD(('/'⎕R'\\')'"',#.settings.r.home,'R.exe" CMD BATCH ',wf,'rserve.r')'Hidden'
           :EndIf
-        :endif
       :ElseIf mac
           ∘ ⍝ my macbook is broken
       :EndIf
@@ -92,7 +79,7 @@
                   ∨/({1=≡⊃⍵:⍵ ⋄ ⊃⍵}attributes[⊂'class'])∊⊂'table':⍵{~⊃attributes[⊂'dim']≡⊂'':⍵⍪⍉(⌽⊃attributes[⊂'dim'])⍴⍺ ⋄ ⍵,[0.5]⍺}⊃attributes[⊂'names']{⍺≢⊂'':⍺ ⋄ ⍵}attributes[⊂'dimnames']
                   ~attributes[⊂'dim']≡⊂'':⍉(⌽⊃attributes[⊂'dim'])⍴⍵
                   attributes[⊂'class']≡⊂'ts':(↑(⍴⍵)↑,↑{(⊂⍳⍵[3]){⍵,¨⍺}¨⍵[1],⍵[1]+⍳⌊(⍵[2]-⍵[1])}⊃attributes[⊂'tsp']),⍵
-                  ∨/({1=≡⊃⍵:⍵ ⋄ ⊃⍵}attributes[⊂'class'])∊⊂'data.frame':(⊃attributes[⊂'names']){0≠⍴⍺:⍺⍪⍵ ⋄ ⍵}⍉↑{⎕IO←1⋄0::⍵ ⋄ (⊃⍵.attributes[⊂'levels'])[⍵.data]}¨{1=≡⍵:⊂⍵ ⋄ ⍵}⍵
+                  ∨/({1=≡⊃⍵:⍵ ⋄ ⊃⍵}attributes[⊂'class'])∊⊂'data.frame':(⊃attributes[⊂'names']){0≠⍴⍺:⍺⍪⍵ ⋄ ⍵}⍉↑{⎕IO←1 ⋄ 0::⍵ ⋄ (⊃⍵.attributes[⊂'levels'])[⍵.data]}¨{1=≡⍵:⊂⍵ ⋄ ⍵}⍵
               }data
             ∇
         :endproperty
@@ -330,7 +317,7 @@
                       b←(0 0 0 0 0 0 240 127)⍷a       ⍝ infinity
                       b∨←(0 0 0 0 0 0 240 255)⍷a      ⍝ -infinity
                       b∨←(0 0 0 0 0 0 248 127)⍷a      ⍝ NaN
-                      b∨←(162 7 0 0 0 0 240 127)⍷a    ⍝ NA_real_ 
+                      b∨←(162 7 0 0 0 0 240 127)⍷a    ⍝ NA_real_
                       bb←∨/b
                       d←∊645 ⎕DR ⎕UCS(~bb)⌿a
                       d←(~bb)\d ⋄ (bb/d)←⎕NULL
@@ -347,7 +334,7 @@
                       b←(0 0 0 0 0 0 240 127)⍷a       ⍝ infinity
                       b∨←(0 0 0 0 0 0 240 255)⍷a      ⍝ -infinity
                       b∨←(0 0 0 0 0 0 248 127)⍷a      ⍝ NaN
-                      b∨←(162 7 0 0 0 0 240 127)⍷a    ⍝ NA_real_/NA_complex_ 
+                      b∨←(162 7 0 0 0 0 240 127)⍷a    ⍝ NA_real_/NA_complex_
                       bb←∨/b
                       d←{a←2÷⍨≢⍵ ⋄ (a↑⍵)+(a↓⍵)×¯1*0.5}∊645 ⎕DR ⎕UCS(~bb)⌿a
                       d←(~bb)\d ⋄ (bb/d)←⎕NULL
