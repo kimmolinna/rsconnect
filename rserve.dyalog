@@ -19,10 +19,8 @@
       :ElseIf win
           :If 2>≢⎕CMD'tasklist /FI "ImageName eq Rserve.exe"'
             ⍝ a←⎕CMD'taskkill /IM Rserve.exe /F'
-              o←⊂'library(Rserve)'
-              o,←⊂'Rserve(args="--no-save --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port ',(⍕#.settings.rserve.port),' >Rserve.log")'
-              (⊂o)⎕NPUT(wf,'rserve.r')1
-              a←⎕CMD(('/'⎕R'\\')'"',#.settings.r.home,'R.exe" CMD BATCH ',wf,'rserve.r')'Hidden'
+              o←'Rserve(args="--no-save --slave --RS-workdir ',(('\\'⎕R'\\\\')wf),' --RS-port ',(⍕#.settings.rserve.port),'")'
+              a←⎕CMD(('/'⎕R'\\')'"',#.settings.r.home,'R.exe" CMD ',#.settings.rserve.home,o)'Hidden'
           :EndIf
       :ElseIf mac
           ∘ ⍝ my macbook is broken

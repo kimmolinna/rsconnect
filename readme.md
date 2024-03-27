@@ -1,6 +1,12 @@
 # RSconnect - R connection for DyalogAPL with Rserve
 "Rserve (see [www.rforge.net/Rserve/](www.rforge.net/Rserve/)) is a TCP/IP server which allows other programs to use facilities of R (see [www.r-project.org](https://www.r-project.org)) from various languages without the need to initialize R or link against R library. Every connection has a separate workspace and working directory." This is true for Linux and Mac but "Windows lacks important features that make the separation of namespaces possible, therefore Rserve for Windows works in cooperative mode only, that is only one connection at a time is allowed and all subsequent connections share the same namespace." 
 
+## Installation of R in Windows
+The easiest way to install R in Windows is to use the following command in terminal
+
+```bash
+winget install RProject.R
+```
 
 ## Installation of Rserve
 The best way to install Rserve is to install it inside of R.
@@ -9,12 +15,18 @@ The best way to install Rserve is to install it inside of R.
 install.packages("Rserve")
 ```
 
-In the default installation the folder of R is `C:/Program Files/R/R-4.1.2/` and you should specify it in a [settings.json](./settings.json) file
+In the default installation the folder of R is `C:/Program Files/R/R-4.3.3/` and you should specify it in a [settings.json](./settings.json) file
 
 ```json
 "r": {
-    "home": "C:/Program Files/R/R-4.1.2/",
+    "home": "C:/Program Files/R/R-4.3.3/bin/x64/",
 ```
+and you should also specify the installation folder of Rserve
+```json
+  "rserve":{
+    "home": "C:/Users/kimmo/AppData/Local/R/win-library/4.3/Rserve/libs/x64/",
+```
+
 
 ## Use in Dyalog
 
@@ -106,14 +118,17 @@ You can change address and port for Rserve in the [settings.json](./settings.jso
 
 ```json
  "rserve":{
+    "home": "C:/Users/kimmo/AppData/Local/R/win-library/4.3/Rserve/libs/x64/",
     "address": "localhost",
     "port": 6311,
     "timeout": 2000
   },
 ```
-The tool uses a R script to start the Rserve by using 
+The tool uses a R script to start the Rserve in Linux by using 
 ```R
 library(Rserve)
 Rserve(args="")
 ```
 This is the easiest way because `Rserve()` command knows how to find Rserve, how to setup the environment and how to start it, regardless of your platform.
+
+But you should specify the location of `Rserve.exe` in [settings.json](./settings.json) file for Windows.
