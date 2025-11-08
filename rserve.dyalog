@@ -73,7 +73,7 @@
         :Access Public
 
             ∇ r←Get args
-              r←{1=≢data:,⍵ ⋄ ⍵}{attributes[⊂'class']≡⊂'factor':⍉attributes[⊂'levels'][⍵]
+              r←{1=≢data:,⍵ ⋄ ⍵}{attributes[⊂'class']≡⊂'factor':⍉(⊃attributes[⊂'levels'])[⍵]
                   ∨/({1=≡⊃⍵:⍵ ⋄ ⊃⍵}attributes[⊂'class'])∊⊂'table':⍵{~⊃attributes[⊂'dim']≡⊂'':⍵⍪⍉(⌽⊃attributes[⊂'dim'])⍴⍺ ⋄ ⍵,[0.5]⍺}⊃attributes[⊂'names']{⍺≢⊂'':⍺ ⋄ ⍵}attributes[⊂'dimnames']
                   ~attributes[⊂'dim']≡⊂'':⍉(⌽⊃attributes[⊂'dim'])⍴⍵
                   attributes[⊂'class']≡⊂'ts':(↑(⍴⍵)↑,↑{(⊂⍳⍵[3]){⍵,¨⍺}¨⍵[1],⍵[1]+⍳⌊(⍵[2]-⍵[1])}⊃attributes[⊂'tsp']),⍵

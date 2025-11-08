@@ -1,12 +1,12 @@
 {
   "rserve":{
-    "home": "C:/Users/kimmo/AppData/Local/R/win-library/4.3/Rserve/libs/x64/",
+    "home": "C:/Users/kimmo/AppData/Local/R/win-library/4.5/Rserve/libs/x64/",
     "address": "localhost",
     "port": 6311,
     "timeout": 4000
   },
   "r": {
-    "home": "C:/Program Files/R/R-4.3.3/bin/x64/",
+    "home": "C:/Program Files/R/R-4.5.2/bin/x64/",
     "attributes": [
       "names",
       "class",
