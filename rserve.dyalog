@@ -279,6 +279,22 @@
                   li←li,⍨XT[⊂'LIST_TAG'],3 IntToBytes≢li
                   o←(128+XT[⊂'ARRAY_DOUBLE']),ld li,d
               :End
+          :Case XT[⊂'ARRAY_BOOL']
+              :If 1=≢⍴i  ⍝ vector
+                  ⍝ Convert ⎕NULL to 2 (NA), keep 0 and 1 as is
+                  d←{⎕NULL≡⍵:2 ⋄ ⍵}¨,i
+                  ⍝ Prepend count as 4 bytes, then pad to multiple of 4
+                  o←XT[⊂'ARRAY_BOOL'],ld(4 IntToBytes≢d),{⍵,1⍴⍨4-4|≢⍵}d
+              :Else  ⍝ matrix
+                  ⍝ Convert ⎕NULL to 2 (NA), keep 0 and 1 as is
+                  d←{⎕NULL≡⍵:2 ⋄ ⍵}¨∊i
+                  dim←⌽⍴i
+                  ⍝ Add dimension attributes like ARRAY_INT does
+                  li←XT[⊂'SYMNAME'],1↓strOut'dim'
+                  li←li,⍨XT[⊂'ARRAY_INT'],ld∊4 IntToBytes¨dim
+                  li←li,⍨XT[⊂'LIST_TAG'],3 IntToBytes≢li
+                  o←(128+XT[⊂'ARRAY_BOOL']),ld li,(4 IntToBytes≢d),{⍵,1⍴⍨4-4|≢⍵}d
+              :EndIf
           :Else
               ∘
           :EndSelect
