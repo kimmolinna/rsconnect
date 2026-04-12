@@ -1,4 +1,5 @@
 ﻿:Namespace RS
+
     ∇ r←init
       wf←⊃⎕NPARTS #.RS{⍺{0=≢⍵:⍺.SALT_Data.SourceFile ⋄ ⍵}' '~⍨⊃⍵{⍵[⍸(⊂⍺){∨/⍺⍷⍵}¨⍵]}⊃¨5176⌶⍬}'rserve.dyalog'
       #.settings←⎕JSON⊃⎕NGET wf,'settings.json'
@@ -78,6 +79,7 @@
                   ~attributes[⊂'dim']≡⊂'':⍉(⌽⊃attributes[⊂'dim'])⍴⍵
                   attributes[⊂'class']≡⊂'ts':(↑(⍴⍵)↑,↑{(⊂⍳⍵[3]){⍵,¨⍺}¨⍵[1],⍵[1]+⍳⌊(⍵[2]-⍵[1])}⊃attributes[⊂'tsp']),⍵
                   ∨/({1=≡⊃⍵:⍵ ⋄ ⊃⍵}attributes[⊂'class'])∊⊂'data.frame':(⊃attributes[⊂'names']){0≠⍴⍺:⍺⍪⍵ ⋄ ⍵}⍉↑{⎕IO←1 ⋄ 0::⍵ ⋄ (⊃⍵.attributes[⊂'levels'])[⍵.data]}¨{1=≡⍵:⊂⍵ ⋄ ⍵}⍵
+                  ⍵
               }data
             ∇
         :endproperty
@@ -214,6 +216,8 @@
         ∇ o←{ty}SEXPout i;a;at;b;d;dim;dt;in;ts;ty
           :If 0=⎕NC'ty' ⋄ ty←⎕DR i ⋄ :EndIf
           :Select ty
+          :Case 11
+              ty←XT[⊂'ARRAY_BOOL']
           :Case 80
               ty←XT[⊂'ARRAY_STR']
           :CaseList 83 163 323
